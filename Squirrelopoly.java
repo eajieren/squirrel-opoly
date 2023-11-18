@@ -28,7 +28,7 @@ public class Squirrelopoly
 		ArrayList<SquirrelPlayer> allPlayers = generatePlayers(numUserPlayers, nonUserPlayerNames);
 		for(SquirrelPlayer sp : allPlayers)
 		{
-			System.out.println(sp.getPlayerID() + ": " + sp.getName());
+			System.out.println(sp.getPlayerID() + ": " + sp.getName() + ", " + sp.getGender());
 		}
 	}
 	
@@ -73,12 +73,13 @@ public class Squirrelopoly
 				String possiblePlyrName = "";
 				do
 				{
-					int randIndex = Math.abs(randGenerator.nextInt()) % uniqueNames.size();
+					int randIndex = Math.abs(randGenerator.nextInt()) % computerPlayerNames.size();
 					Object[] objArr = computerPlayerNames.toArray();
 					possiblePlyrName = (String) objArr[randIndex];
 				}
 				while(!uniqueNames.add(possiblePlyrName));
-				allPlayers.add(new SquirrelPlayer(possiblePlyrName, false));
+				int nameLen = possiblePlyrName.length();
+				allPlayers.add(new SquirrelPlayer(possiblePlyrName.substring(0, nameLen-2), false, possiblePlyrName.charAt(nameLen-1) == 'M'));
 				computerPlayerNames.remove(possiblePlyrName);
 			}
 		}
@@ -95,45 +96,47 @@ public class Squirrelopoly
 		for(int i = 0; i < numUserPlayers; i++)
 		{
 			String playerName = "";
+			boolean isMale = (new Random().nextInt()) % 2 == 0;
 			boolean firstIteration = true;
 					
 			do
 			{
 				if(firstIteration)
 				{
-					playerName = getUserPlayerName(i+1);
+					playerName = getUserPlayerName(i+1, isMale);
 					firstIteration = false;
 				}
 				else
 				{
 					JOptionPane.showMessageDialog(null, "Uh-oh! That player name is already in use. Please enter a unique player name.", "Duplicate Name", JOptionPane.ERROR_MESSAGE);
-					playerName = getUserPlayerName(i+1);
+					playerName = getUserPlayerName(i+1, isMale);
 				}
 			}
 			while(!playerNames.add(playerName));	//this will continue to loop while the name is not a unique player name
 					
-			userPlayers.add(new SquirrelPlayer(playerName, true));
+			userPlayers.add(new SquirrelPlayer(playerName, true, isMale));
 		}
 				
 		return userPlayers;
 	}
 	
-	private static String getUserPlayerName(int playerNum)
+	private static String getUserPlayerName(int playerNum, boolean isMale)
 	{
 		String playerName = "";
+		String gender = isMale ? "male" : "female";
 		boolean firstIteration = true;
 		
 		do
 		{
 			if(firstIteration)
 			{
-				playerName = JOptionPane.showInputDialog("Please enter a name for Player #" + playerNum + ":");
+				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character:");
 				firstIteration = false;
 			}
 			else
 			{
 				JOptionPane.showMessageDialog(null, "Invalid Input! Please try again.", "ERROR", JOptionPane.ERROR_MESSAGE);
-				playerName = JOptionPane.showInputDialog("Please enter a name for Player #" + playerNum + ":");
+				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character:");
 			}
 		}
 		while(playerName == null || playerName.length() < 1);
