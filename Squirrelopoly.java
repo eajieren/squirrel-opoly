@@ -30,6 +30,10 @@ public class Squirrelopoly
 		{
 			System.out.println(sp.getPlayerID() + ": " + sp.getName() + ", " + sp.getGender());
 		}
+		
+		GameGUI gui = new GameGUI();
+		Game currentGame = new Game(board, allPlayers, gui);
+		currentGame.play();
 	}
 	
 	private static int getNumPlayers()
