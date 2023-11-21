@@ -30,10 +30,14 @@ public class Game
 	
 	public void play()
 	{
+		gameDisplay.pack();
+		gameDisplay.setVisible(true);
+		//reference comment; not meant to be uncommented
 		//int[] result = {rollDie(), rollDie(), rollDie()};
-		int resultSum = rollDice(3, false);
 		
-		System.out.print("Dice Roll Sum = " + resultSum);
+		
+		//int resultSum = rollDice(3, true);
+		//System.out.print("Dice Roll Sum = " + resultSum);
 	}
 	
 	private int rollDice(int numDice, boolean isUser)

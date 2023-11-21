@@ -31,7 +31,7 @@ public class Squirrelopoly
 			System.out.println(sp.getPlayerID() + ": " + sp.getName() + ", " + sp.getGender());
 		}
 		
-		GameGUI gui = new GameGUI();
+		GameGUI gui = new GameGUI(board.getNumSpaces());
 		Game currentGame = new Game(board, allPlayers, gui);
 		currentGame.play();
 	}
@@ -151,7 +151,7 @@ public class Squirrelopoly
 	//returns true if the input string contains only numeric characters; false, otherwise
 	private static boolean isNonNegIntString(String input)
 	{
-		if(input == null)
+		if(input == null || input.length() == 0)
 			return false;
 		
 		for(char c : input.toCharArray())
