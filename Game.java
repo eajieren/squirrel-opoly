@@ -30,6 +30,7 @@ public class Game
 	
 	public void play()
 	{
+		gameDisplay.setGameInPlay(true);
 		gameDisplay.pack();
 		gameDisplay.setVisible(true);
 		//reference comment; not meant to be uncommented

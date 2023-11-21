@@ -1,7 +1,7 @@
 
 public class GameBoard
 {
-	private final int NUM_SPACES, DEFAULT_SIZE = 80;
+	private final int NUM_SPACES, DEFAULT_SIZE = 40;
 	
 	public GameBoard()
 	{
