@@ -31,7 +31,7 @@ public class GameGUI extends JFrame implements KeyListener
 		inPlay = false;
 		//set customizable settings of Frame
 		setPreferredSize(new Dimension(F_WIDTH, F_HEIGHT));
-		//setResizable(false);
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		GameGUI gui = this;
 		addWindowListener(new WindowAdapter()
@@ -126,6 +126,8 @@ public class GameGUI extends JFrame implements KeyListener
 		}
 		
 		System.out.println("(" + ulc_x + ", " + ulc_y + ")");
+		phics.setColor(Color.YELLOW);
+		phics.fillRect(HORIZ_BORDER + ulc_x + 1, VERT_BORDER + ulc_y + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 	}
 	
 	/********************************************************************************************/
