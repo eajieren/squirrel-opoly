@@ -16,7 +16,8 @@ public class GameGUI extends JFrame implements KeyListener
 	private static final int F_WIDTH = 799, F_HEIGHT = 799;
 	private static final int HORIZ_BORDER = 53, VERT_BORDER = 53;
 	private static final String GAME_NAME = "Squirrel-opoly";
-	private static final Color[] colors = {Color.BLUE, Color.GRAY, Color.ORANGE, Color.MAGENTA};
+	private static final Color[] COLORS = {Color.BLUE, Color.GRAY, Color.ORANGE, Color.MAGENTA};
+	private final Color DEFAULT_BACKGROUND_COLOR;
 	
 	private final int BOARD_SPACE_DIM, NUM_SPACES;
 	private boolean inPlay;
@@ -25,6 +26,7 @@ public class GameGUI extends JFrame implements KeyListener
 	public GameGUI(int numSpaces)
 	{
 		super(GAME_NAME);
+		DEFAULT_BACKGROUND_COLOR = this.getBackground();
 		
 		BOARD_SPACE_DIM = (F_WIDTH - (2 * HORIZ_BORDER)) / (numSpaces / 4 + 1);
 		NUM_SPACES = numSpaces;
@@ -60,9 +62,22 @@ public class GameGUI extends JFrame implements KeyListener
 	{
 		if(inPlay)
 		{
+			freshStart(phics);
 			drawBoard(phics);
 			drawFigures(phics);
 		}
+	}
+	
+	public void updateMyPosition(SquirrelPlayer player)
+	{
+		positions[player.getPlayerID()] = player.getGamePosition();
+		repaint();
+	}
+	
+	private void freshStart(Graphics phics)
+	{
+		phics.setColor(DEFAULT_BACKGROUND_COLOR);
+		phics.fillRect(0, 0, getWidth(), getHeight());
 	}
 	
 	private void drawBoard(Graphics phics)
@@ -93,31 +108,45 @@ public class GameGUI extends JFrame implements KeyListener
 	
 	private void drawFigures(Graphics phics)
 	{
-		Random rand = new Random();
+		/*Random rand = new Random();
 		int randSpace = Math.abs(rand.nextInt()) % NUM_SPACES;
-		System.out.println("Space #: " + randSpace);
+		System.out.println("Space #: " + randSpace);*/
 		
-		int wholeQuotient = randSpace / (NUM_SPACES/4);
+		for(int playerID = 0; playerID < 4; playerID++)
+		{
+			int[] ulc = spaceToCoordPair(positions[playerID]);
+			
+			System.out.println("PlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
+			phics.setColor(COLORS[playerID]);
+			phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+		}
+		
+		
+	}
+	
+	private int[] spaceToCoordPair(int spaceNum)
+	{
+		int wholeQuotient = spaceNum / (NUM_SPACES/4);
 		
 		//x and y pixel coordinates of the upper left-hand corner of the space
 		int ulc_x = 0, ulc_y = 0;
 		switch(wholeQuotient)
 		{
 			case 0:
-				ulc_x = randSpace * BOARD_SPACE_DIM;
+				ulc_x = spaceNum * BOARD_SPACE_DIM;
 				ulc_y = 0;
 				break;
 			case 1:
 				ulc_x = (NUM_SPACES/4) * BOARD_SPACE_DIM;
-				ulc_y = (randSpace - NUM_SPACES/4) * BOARD_SPACE_DIM;
+				ulc_y = (spaceNum - NUM_SPACES/4) * BOARD_SPACE_DIM;
 				break;
 			case 2:
-				ulc_x = (3*NUM_SPACES/4 - randSpace) * BOARD_SPACE_DIM;
+				ulc_x = (3*NUM_SPACES/4 - spaceNum) * BOARD_SPACE_DIM;
 				ulc_y = (NUM_SPACES/4) * BOARD_SPACE_DIM;
 				break;
 			case 3:
 				ulc_x = 0;
-				ulc_y = (NUM_SPACES - randSpace) * BOARD_SPACE_DIM;
+				ulc_y = (NUM_SPACES - spaceNum) * BOARD_SPACE_DIM;
 				break;
 			default:
 				ulc_x = 0;
@@ -125,9 +154,7 @@ public class GameGUI extends JFrame implements KeyListener
 				break;
 		}
 		
-		System.out.println("(" + ulc_x + ", " + ulc_y + ")");
-		phics.setColor(Color.YELLOW);
-		phics.fillRect(HORIZ_BORDER + ulc_x + 1, VERT_BORDER + ulc_y + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+		return new int[]{ulc_x, ulc_y};
 	}
 	
 	/********************************************************************************************/

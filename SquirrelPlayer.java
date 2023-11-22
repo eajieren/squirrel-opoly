@@ -17,11 +17,11 @@ public class SquirrelPlayer
 		}
 	}
 	
-	private static int playerIDCounter = 1;
+	private static int playerIDCounter = 0;
 	
 	private String myName;
-	private boolean isUserPlayer;
-	private int myPlayerID;
+	private boolean isUserPlayer, isImpounded;
+	private int myPlayerID, doublesRolled, gamePosition;
 	private Gender myGender;
 	
 	public SquirrelPlayer(String name, boolean userPlayer, boolean male)
@@ -29,6 +29,9 @@ public class SquirrelPlayer
 		myName = name;
 		isUserPlayer = userPlayer;
 		myPlayerID = playerIDCounter++;
+		isImpounded = false;
+		doublesRolled = 0;
+		gamePosition = 0;
 		if(male)
 			myGender = Gender.MALE;
 		else
@@ -40,9 +43,20 @@ public class SquirrelPlayer
 		return myName;
 	}
 	
+	public int getGamePosition()
+	{
+		return gamePosition;
+	}
+	
 	public boolean isUserPlayer()
 	{
 		return isUserPlayer;
+	}
+	
+	//returns whether or not the player is in the custody of Animal Control
+	public boolean isImpounded()
+	{
+		return isImpounded;
 	}
 	
 	public int getPlayerID()
@@ -53,5 +67,31 @@ public class SquirrelPlayer
 	public Gender getGender()
 	{
 		return myGender;
+	}
+	
+	public int getNumDoublesRolled()
+	{
+		return doublesRolled;
+	}
+	
+	public void advanceSpaces(int numSpcs, int totalBoardSpcs)
+	{
+		gamePosition += numSpcs;
+		gamePosition %= totalBoardSpcs;
+	}
+	
+	public void setImpoundStatus(boolean impoundStatus)
+	{
+		isImpounded = impoundStatus;
+	}
+	
+	public void incrementDoubles()
+	{
+		doublesRolled++;
+	}
+	
+	public void zeroOutDoubles()
+	{
+		doublesRolled = 0;
 	}
 }
