@@ -1,19 +1,14 @@
 
 public class GameBoard
 {
-	private final int NUM_SPACES, DEFAULT_SIZE = 80;
+	private final int NUM_SPACES, DEFAULT_SMALL = 40, DEFAULT_LARGE = 80;
 	
-	public GameBoard()
+	public GameBoard(boolean smallBoard)
 	{
-		NUM_SPACES = DEFAULT_SIZE;
-	}
-	
-	public GameBoard(int numSpaces)
-	{
-		if(numSpaces > 0 && numSpaces % 4 == 0)
-			NUM_SPACES = numSpaces;
+		if(smallBoard)
+			NUM_SPACES = DEFAULT_SMALL;
 		else
-			NUM_SPACES = DEFAULT_SIZE;
+			NUM_SPACES = DEFAULT_LARGE;
 	}
 	
 	public int getNumSpaces()

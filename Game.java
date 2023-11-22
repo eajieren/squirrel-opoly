@@ -40,15 +40,14 @@ public class Game
 		
 		int currentPlayerID = getFirstPlayerID();
 		
-		for(int turns = 0; turns < 5; turns++)
+		for(int turns = 0; turns < 20; turns++)
 		//while(!gameOver())
 		{
 			giveTurn(players.get((currentPlayerID++) % NUM_PLAYERS));
-			//cycle through players
-			//allow them to play a turn
 		}
-			
-		gameDisplay.setGameInPlay(false);
+		
+		if(gameOver())
+			gameDisplay.setGameInPlay(false);
 		
 		//int resultSum = rollDice(3, true);
 		//System.out.print("Dice Roll Sum = " + resultSum);
@@ -193,8 +192,7 @@ public class Game
 			}
 		}
 		
-		if(roller.isUserPlayer())
-			displayDiceRoll(rollResults, gameDisplay);
+		displayDiceRoll(rollResults, gameDisplay);
 		
 		System.out.println("Game.rollDice(): " + roller.getName() + ": " + sum);
 		

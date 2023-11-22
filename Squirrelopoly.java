@@ -16,7 +16,7 @@ public class Squirrelopoly
 	{
 		//intro
 		System.out.println("Welcome to Squirrelopoly!");
-		GameBoard board = new GameBoard();
+		GameBoard board = new GameBoard(false);
 		System.out.println("Game board size: " + board.getNumSpaces() + " spaces");
 		
 		//prompt user for # user players
@@ -134,16 +134,16 @@ public class Squirrelopoly
 		{
 			if(firstIteration)
 			{
-				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character:");
+				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character (Max 30 characters):");
 				firstIteration = false;
 			}
 			else
 			{
 				JOptionPane.showMessageDialog(null, "Invalid Input! Please try again.", "ERROR", JOptionPane.ERROR_MESSAGE);
-				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character:");
+				playerName = JOptionPane.showInputDialog("Player #" + playerNum + ", you will be playing a " + gender + " squirrel. Please enter a name for your character (Max 30 characters):");
 			}
 		}
-		while(playerName == null || playerName.length() < 1);
+		while(playerName == null || playerName.length() < 1 || playerName.length() > 30);
 		
 		return playerName;
 	}
