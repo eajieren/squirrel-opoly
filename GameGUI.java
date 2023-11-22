@@ -63,14 +63,18 @@ public class GameGUI extends JFrame implements KeyListener
 		if(inPlay)
 		{
 			freshStart(phics);
+			System.out.println("1");
 			drawBoard(phics);
+			System.out.println("2");
 			drawFigures(phics);
+			System.out.println("3");
 		}
 	}
 	
 	public void updateMyPosition(SquirrelPlayer player)
 	{
 		positions[player.getPlayerID()] = player.getGamePosition();
+		System.out.println(player.getName() + " moves to " + player.getGamePosition());
 		repaint();
 	}
 	
@@ -112,11 +116,12 @@ public class GameGUI extends JFrame implements KeyListener
 		int randSpace = Math.abs(rand.nextInt()) % NUM_SPACES;
 		System.out.println("Space #: " + randSpace);*/
 		
+		System.out.println("GameGUI.drawFigures():");
 		for(int playerID = 0; playerID < 4; playerID++)
 		{
 			int[] ulc = spaceToCoordPair(positions[playerID]);
 			
-			System.out.println("PlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
+			System.out.println("\tPlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
 			phics.setColor(COLORS[playerID]);
 			phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 		}

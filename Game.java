@@ -40,12 +40,13 @@ public class Game
 		
 		int currentPlayerID = getFirstPlayerID();
 		
+		for(int turns = 0; turns < 5; turns++)
 		//while(!gameOver())
-		//{
-			giveTurn(players.get(currentPlayerID++));
+		{
+			giveTurn(players.get((currentPlayerID++) % NUM_PLAYERS));
 			//cycle through players
 			//allow them to play a turn
-		//}
+		}
 			
 		gameDisplay.setGameInPlay(false);
 		
@@ -104,7 +105,7 @@ public class Game
 			//get the roll for this player with 2 dice
 			int rollResult = rollDice(2, turnPlayer);
 			
-			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls a " + rollResult + ".");
+			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
 			clearScreen(gameDisplay);
 			
 			if(turnPlayer.getNumDoublesRolled() > 2)
@@ -126,10 +127,30 @@ public class Game
 				
 				//bounce-off, as we never have 2 squirrels in the same space
 			}
+			
+			System.out.println("Game.giveTurn: " + turnPlayer.getName() + " " + turnPlayer.getGamePosition());
 		}
 		while(turnPlayer.getNumDoublesRolled() > 0);
 		
+		System.out.println("end of turn");
 		//options: roll; advance; complete actions
+	}
+	
+	/*
+	 * pre-condition: num < 80
+	 * post-condition: returns the string formatted with the appropriate preceding indefinite article (a or an)
+	 */
+	private String formatIndefiniteArticle(int num)
+	{
+		switch(num)
+		{
+			case 8:
+			case 11:
+			case 18:
+				return "an " + num;
+			default:
+				return "a " + num;
+		}
 	}
 	
 	//check if gameboard space at position spaceNum is available for SquirrelPlayer player;
@@ -174,6 +195,8 @@ public class Game
 		
 		if(roller.isUserPlayer())
 			displayDiceRoll(rollResults, gameDisplay);
+		
+		System.out.println("Game.rollDice(): " + roller.getName() + ": " + sum);
 		
 		return sum;
 	}
