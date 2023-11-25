@@ -40,14 +40,28 @@ public class Game
 		
 		int currentPlayerID = getFirstPlayerID();
 		
-		for(int turns = 0; turns < 20; turns++)
-		//while(!gameOver())
+		while(!gameOver())
 		{
-			giveTurn(players.get((currentPlayerID++) % NUM_PLAYERS));
+			if(players.get(currentPlayerID % NUM_PLAYERS).isAlive())
+			{
+				giveTurn(players.get(currentPlayerID % NUM_PLAYERS));
+			}
+				
+			currentPlayerID++;
 		}
 		
 		if(gameOver())
+		{
 			gameDisplay.setGameInPlay(false);
+			/*for(SquirrelPlayer sp : players)
+			* {
+			* 	if(sp.isAlive())
+			* 	{
+			* 		//add 15-20 points
+			* 	}
+			* }
+			*/
+		}
 		
 		//int resultSum = rollDice(3, true);
 		//System.out.print("Dice Roll Sum = " + resultSum);
@@ -113,6 +127,10 @@ public class Game
 		
 		do
 		{
+			//if (turnPlayer.getNumMoves() + 1) % eatingFrequency == 0
+			//if(turnPlayer.getFoodUnits() >= baseMetabolism)
+			//{give opportunity to forage, advance, dig for buried nuts, } else {player must forage}
+			
 			//get the roll for this player with 2 dice
 			int rollResult = rollDice(2, turnPlayer);
 			
@@ -130,12 +148,14 @@ public class Game
 			
 			gameDisplay.updateMyPosition(turnPlayer);
 			
+			turnPlayer.incrementMoves();
+			
 			//String proceedString = "";
 			//if(passProceed)
 			//	proceedString = passProceed(turnPlayer);
-			//passProceed method works in 3 parts: (1) allow user to regain health OR find __ food units; 
+			//passProceed method works in 4 parts: (1) allow user to regain health OR find __ food units; 
 			// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature;
-			// AND (3) return a String summarizing what happened as a result of passing Proceed
+			// (3) add points for successful trip around AND (4) return a String summarizing what happened as a result of passing Proceed
 			
 			//announce where the player is on the gameboard
 			System.out.println(/*proceedString +*/ turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
@@ -225,7 +245,16 @@ public class Game
 	
 	private boolean gameOver()
 	{
-		return false;
+		int numPlayersAlive = 0;
+		for(SquirrelPlayer sp : players)
+		{
+			if(sp.isAlive())
+			{
+				numPlayersAlive++;
+			}
+		}
+		
+		return numPlayersAlive < 2;
 	}
 	
 	private static int rollDie()

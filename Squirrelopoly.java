@@ -16,7 +16,8 @@ public class Squirrelopoly
 	{
 		//intro
 		System.out.println("Welcome to Squirrelopoly!");
-		GameBoard board = new GameBoard(false);
+		ArrayList<String> oklahomaTrees = textFileToArrayList("src/TreesOfOK.txt");
+		GameBoard board = new GameBoard(false, oklahomaTrees);
 		System.out.println("Game board size: " + board.getNumSpaces() + " spaces");
 		
 		//prompt user for # user players

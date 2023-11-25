@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GameBoard
@@ -10,7 +11,7 @@ public class GameBoard
 	private GameSpace[] spaces;
 	private int cornerCode_index, parkCode_index;
 	
-	public GameBoard(boolean smallBoard)
+	public GameBoard(boolean smallBoard, ArrayList<String> treeNames)
 	{
 		if(smallBoard)
 			NUM_SPACES = DEFAULT_SMALL;
@@ -20,7 +21,7 @@ public class GameBoard
 		//spcToLocationCode = new String[NUM_SPACES];
 		spaces = new GameSpace[NUM_SPACES];
 		cornerCode_index = parkCode_index = 0;
-		setup();
+		setup(treeNames);
 		
 		//for testing setup() method:
 		///*_****************************************************
@@ -45,7 +46,7 @@ public class GameBoard
 			return spaces[spaceNum].getCode();//spcToLocationCode[spaceNum];
 	}
 	
-	private void setup()
+	private void setup(ArrayList<String> treeNames)
 	{
 		for(int spc = 0; spc < NUM_SPACES; spc++)
 		{
@@ -92,8 +93,9 @@ public class GameBoard
 			Integer[] treeMods = {1, 2, 7, 8};
 			if(Arrays.asList(treeMods).contains(Integer.valueOf(mod10)))
 			{
+				String treeString = treeNames.remove(Math.abs(rand.nextInt()) % treeNames.size());
 				//spaces for various tree locations, the names of which come from the TreesOfOK text file
-				spaces[spc] = new ResidenceSpace("Tree Spot", Math.abs(rand.nextInt()) % 3 + 1);
+				spaces[spc] = new ResidenceSpace(treeString, Math.abs(rand.nextInt()) % 3 + 1);
 			}
 		}
 	}
