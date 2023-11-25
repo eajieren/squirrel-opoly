@@ -97,7 +97,20 @@ public class Game
 	
 	private void giveTurn(SquirrelPlayer turnPlayer)
 	{
-		JOptionPane.showMessageDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.");
+		boolean exit;
+		do
+		{
+			Object[] choices = {"OK", "EXIT"};
+			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.", "Proceed to " + turnPlayer.getName() + "\'s turn", 
+					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
+			if(exit)
+			{
+				if(GameGUI.exit(gameDisplay))
+					System.exit(0);
+			}
+		}
+		while(exit);
+		
 		
 		do
 		{
@@ -117,6 +130,9 @@ public class Game
 			turnPlayer.advanceSpaces(rollResult, myBoard.getNumSpaces());
 			
 			gameDisplay.updateMyPosition(turnPlayer);
+			
+			//announce where the player is on the gameboard
+			System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
 			
 			//if the space is occupied by another player, 
 			if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
@@ -231,9 +247,9 @@ public class Game
 		activeGUI.repaint();
 	}
 
-	private static boolean exit()
+	/*private static boolean exit()
 	{
 		return JOptionPane.showConfirmDialog(null, "Are you sure that you want to quit?",
 			"EXIT?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-	}
+	}*/
 }

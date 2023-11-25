@@ -125,8 +125,6 @@ public class GameGUI extends JFrame implements KeyListener
 			phics.setColor(COLORS[playerID]);
 			phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 		}
-		
-		
 	}
 	
 	private int[] spaceToCoordPair(int spaceNum)
@@ -169,11 +167,15 @@ public class GameGUI extends JFrame implements KeyListener
 		//filler to satisfy the KeyListener interface
 	}
 	
-	//closes this Frame when the user presses ENTER
+	//closes this Frame when the user presses ESCAPE
 	public void keyReleased(KeyEvent ke)
 	{
-		if(ke.getKeyCode() == KeyEvent.VK_ENTER)
+		/*if(ke.getKeyCode() == KeyEvent.VK_ESCAPE)
 		{
+			if(exit(this))
+			{
+				System.exit(0);
+			}
 			/*System.out.println("Key Released");
 			dispose();
 			
@@ -183,7 +185,7 @@ public class GameGUI extends JFrame implements KeyListener
 			add(stDisplay);
 			pack();
 			setVisible(true);*/
-		}
+		//}
 	}
 	
 	public void keyTyped(KeyEvent ke){
@@ -191,7 +193,7 @@ public class GameGUI extends JFrame implements KeyListener
 	}
 	/********************************************************************************************/
 	
-	private static boolean exit(JFrame frame)
+	public static boolean exit(JFrame frame)
 	{
 		return JOptionPane.showConfirmDialog(frame, "Are you sure that you want to quit " + GAME_NAME + "?",
 			"EXIT?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;

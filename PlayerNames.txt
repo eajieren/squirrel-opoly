@@ -67,3 +67,5 @@ Doug,M
 Dawn,F
 Felicia,F
 Pete,M
+Juliana,F
+Alvin,M

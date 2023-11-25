@@ -14,16 +14,28 @@ public class GameBoard
 		
 		spcToLocationCode = new String[NUM_SPACES];
 		setup();
+		
+		//for testing setup() method:
+		///*_****************************************************
 		System.out.println("GameBoard constructor: Locations:");
 		for(int spcNum = 0; spcNum < NUM_SPACES; spcNum++)
 		{
 			System.out.println("\t" + spcNum + ": " + spcToLocationCode[spcNum]);
 		}
+		//*****************************************************_*/
 	}
 	
 	public int getNumSpaces()
 	{
 		return NUM_SPACES;
+	}
+	
+	public String getLocationName(int spaceNum)
+	{
+		if(spaceNum < 0 || spaceNum >= NUM_SPACES)
+			return null;
+		else
+			return spcToLocationCode[spaceNum];
 	}
 	
 	private void setup()
