@@ -18,10 +18,11 @@ public class SquirrelPlayer
 	}
 	
 	private static int playerIDCounter = 0;
+	private static final int MAX_HEALTH = 20;
 	
 	private String myName;
-	private boolean isUserPlayer, isImpounded;
-	private int myPlayerID, doublesRolled, gamePosition;
+	private boolean isUserPlayer, isImpounded, sexuallyMature;
+	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth;
 	private Gender myGender;
 	
 	public SquirrelPlayer(String name, boolean userPlayer, boolean male)
@@ -30,6 +31,8 @@ public class SquirrelPlayer
 		isUserPlayer = userPlayer;
 		myPlayerID = playerIDCounter++;
 		isImpounded = false;
+		sexuallyMature = false;
+		currentHealth = myMaxHealth = MAX_HEALTH;
 		doublesRolled = 0;
 		gamePosition = 0;
 		if(male)
@@ -74,10 +77,25 @@ public class SquirrelPlayer
 		return doublesRolled;
 	}
 	
-	public void advanceSpaces(int numSpcs, int totalBoardSpcs)
+	//advances the player numSpcs spaces and returns true if the player passes go while moving forward
+	public boolean advanceSpaces(int numSpcs, int totalBoardSpcs)
 	{
 		gamePosition += numSpcs;
-		gamePosition %= totalBoardSpcs;
+		
+		//if the resulting game position is negative, we need to make it valid (between 0 and totalBoardSpcs-1, inclusive)
+		if(gamePosition < 0)
+		{
+			gamePosition += totalBoardSpcs;
+			return false;
+		}
+		
+		if(gamePosition >= totalBoardSpcs)
+		{
+			gamePosition %= totalBoardSpcs;
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public void setImpoundStatus(boolean impoundStatus)

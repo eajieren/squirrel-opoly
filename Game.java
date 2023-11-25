@@ -111,7 +111,6 @@ public class Game
 		}
 		while(exit);
 		
-		
 		do
 		{
 			//get the roll for this player with 2 dice
@@ -127,18 +126,27 @@ public class Game
 			}
 			
 			//update the move within the Player, on the board, and in the game, checking to see whether it's occupied
-			turnPlayer.advanceSpaces(rollResult, myBoard.getNumSpaces());
+			boolean passProceed = turnPlayer.advanceSpaces(rollResult, myBoard.getNumSpaces());
 			
 			gameDisplay.updateMyPosition(turnPlayer);
 			
+			//String proceedString = "";
+			//if(passProceed)
+			//	proceedString = passProceed(turnPlayer);
+			//passProceed method works in 3 parts: (1) allow user to regain health OR find __ food units; 
+			// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature;
+			// AND (3) return a String summarizing what happened as a result of passing Proceed
+			
 			//announce where the player is on the gameboard
-			System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
+			System.out.println(/*proceedString +*/ turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
 			
 			//if the space is occupied by another player, 
 			if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
 			{
 				//we give the opportunity for breeding if opposite genders
 				//You've found a potential mate! Wanna get squirrelly?
+				//In order to breed: (1) both players must have passed Proceed once
+				//					(2)8/(365*4+1) chance
 				
 				//bounce-off, as we never have 2 squirrels in the same space
 			}
@@ -147,8 +155,8 @@ public class Game
 		}
 		while(turnPlayer.getNumDoublesRolled() > 0);
 		
-		System.out.println("end of turn");
-		//options: roll; advance; complete actions
+		//COMMENT FOR DEBUGGING:
+		//System.out.println("end of turn");
 	}
 	
 	/*
