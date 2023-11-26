@@ -1,3 +1,4 @@
+import javax.swing.JOptionPane;
 
 public class SquirrelPlayer
 {
@@ -21,9 +22,9 @@ public class SquirrelPlayer
 	private static final int MAX_HEALTH = 20, MAX_FOOD = 3, STARTING_FOOD = 2;
 	
 	private String myName;
-	private boolean isUserPlayer, isImpounded, sexuallyMature;
+	private boolean isUserPlayer, isImpounded, sexuallyMature, isTrapped;
 	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth;
-	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves;
+	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves, trapTurns, totalTrapTurns;
 	private Gender myGender;
 	
 	public SquirrelPlayer(String name, boolean userPlayer, boolean male)
@@ -33,10 +34,11 @@ public class SquirrelPlayer
 		myPlayerID = playerIDCounter++;
 		isImpounded = false;
 		sexuallyMature = false;
+		isTrapped = false;
 		currentHealth = myMaxHealth = MAX_HEALTH;
 		foodUnitCarryingCapacity = MAX_FOOD - 1;
 		currentFoodUnits = STARTING_FOOD;
-		doublesRolled = gamePosition = numMoves = 0;
+		doublesRolled = gamePosition = numMoves = trapTurns = totalTrapTurns = 0;
 		if(male)
 			myGender = Gender.MALE;
 		else
@@ -99,6 +101,21 @@ public class SquirrelPlayer
 		return numMoves;
 	}
 	
+	public int getTrapTurns()
+	{
+		return trapTurns;
+	}
+	
+	public int getTotalTrapTurns()
+	{
+		return totalTrapTurns;
+	}
+	
+	public boolean getTrappedStatus()
+	{
+		return isTrapped;
+	}
+	
 	//advances the player numSpcs spaces and returns true if the player passes go while moving forward
 	public boolean advanceSpaces(int numSpcs, int totalBoardSpcs)
 	{
@@ -125,9 +142,38 @@ public class SquirrelPlayer
 		numMoves++;
 	}
 	
+	public void setTotalTrapTurns(int totalTrapped)
+	{
+		totalTrapTurns = totalTrapped;
+	}
+	
+	public void incrementTrapTurns()
+	{
+		trapTurns++;
+	}
+	
+	//NOT DONE
 	public void setCurrentHealth(int healthInt)
 	{
 		currentHealth = healthInt;
+		
+		if(healthInt <= 0)
+		{
+			//all properties owned by this player are set back to owner=null
+			
+			JOptionPane.showMessageDialog(null, myName + " has lost all health points and is now dead.");
+		}
+	}
+	
+	public void setTrappedStatus(boolean status)
+	{
+		isTrapped = status;
+		
+		if(!isTrapped)
+		{
+			trapTurns = 0;
+			totalTrapTurns = 0;
+		}
 	}
 	
 	public void setMaxHealth(int max)

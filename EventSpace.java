@@ -1,13 +1,10 @@
 
-public class EventSpace extends GameSpace
+public abstract class EventSpace extends GameSpace
 {
 	public EventSpace(String code)
 	{
 		super(code);
 	}
 	
-	public void applyEvent(SquirrelPlayer player)
-	{
-		
-	}
+	public abstract void applyEvent(SquirrelPlayer player, GameGUI display);
 }

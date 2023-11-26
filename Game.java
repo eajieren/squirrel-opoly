@@ -127,6 +127,21 @@ public class Game
 		
 		do
 		{
+			if(turnPlayer.getTrappedStatus() == true)
+			{
+				turnPlayer.incrementTrapTurns();
+				if(turnPlayer.getTrapTurns() > turnPlayer.getTotalTrapTurns())
+				{
+					turnPlayer.setTrappedStatus(false);
+					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has been released from the trap and may now resume regular turns.");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is stuck in a live trap and skips turn " + turnPlayer.getTrapTurns() +
+							" of " + turnPlayer.getTotalTrapTurns() + ".");
+					break;
+				}
+			}
 			//if (turnPlayer.getNumMoves() + 1) % eatingFrequency == 0
 			//if(turnPlayer.getFoodUnits() >= baseMetabolism)
 			//{give opportunity to forage, advance, dig for buried nuts, } else {player must forage}
@@ -165,10 +180,24 @@ public class Game
 			{
 				//we give the opportunity for breeding if opposite genders
 				//You've found a potential mate! Wanna get squirrelly?
-				//In order to breed: (1) both players must have passed Proceed once
-				//					(2)8/(365*4+1) chance
+				//In order to breed: (1) genders must be opposite (2) both players must have passed Proceed once
+				//					(3)8/(365*4+1) chance
 				
 				//bounce-off, as we never have 2 squirrels in the same space
+			}
+			else	//the space is open,
+			{
+				GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
+				if(space instanceof LiveTrap)
+				{
+					((LiveTrap) space).applyEvent(turnPlayer, gameDisplay);
+				}
+				//apply the square's actions on this player
+				//if it's a residence space, the person should be offered the chance to:
+				//(1) claim as theirs if it's not owned and they have number of food units required
+				//(2) forage
+				//(3) rest in drey (if it's yours)
+				//(4) bury food
 			}
 			
 			System.out.println("Game.giveTurn: " + turnPlayer.getName() + " " + turnPlayer.getGamePosition());
@@ -257,13 +286,13 @@ public class Game
 		return numPlayersAlive < 2;
 	}
 	
-	private static int rollDie()
+	public static int rollDie()
 	{
 		Random rand = new Random(System.nanoTime());
 		return Math.abs(rand.nextInt()) % 6 + 1;
 	}
 	
-	private static void displayDiceRoll(int[] rolls, GameGUI activeGUI)
+	public static void displayDiceRoll(int[] rolls, GameGUI activeGUI)
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout());
