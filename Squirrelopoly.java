@@ -27,12 +27,15 @@ public class Squirrelopoly
 		ArrayList<String> nonUserPlayerNames = textFileToArrayList("src/PlayerNames.txt");
 		
 		ArrayList<SquirrelPlayer> allPlayers = generatePlayers(numUserPlayers, nonUserPlayerNames);
-		for(SquirrelPlayer sp : allPlayers)
+		String[] names = new String[TOTAL_NUM_PLAYERS];
+		for(int i = 0; i < allPlayers.size(); i++)
 		{
+			SquirrelPlayer sp = allPlayers.get(i);
+			names[i] = sp.getName();
 			System.out.println(sp.getPlayerID() + ": " + sp.getName() + ", " + sp.getGender());
 		}
 		
-		GameGUI gui = new GameGUI(board.getNumSpaces());
+		GameGUI gui = new GameGUI(board.getNumSpaces(), names);
 		Game currentGame = new Game(board, allPlayers, gui);
 		currentGame.play();
 	}

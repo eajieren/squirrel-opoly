@@ -73,7 +73,7 @@ public class LiveTrap extends EventSpace
 		
 		if(player.isUserPlayer())
 		{
-			JOptionPane.showMessageDialog(display, "You've chosen to wait for your release. You'll now roll one die, divide the result by two, and round up " +
+			JOptionPane.showMessageDialog(display, player.getName() + ": You've chosen to wait for your release. You'll now roll one die, divide the result by two, and round up " +
 				"to the nearest whole number in order to determine how many turns to wait.");
 		}
 		else

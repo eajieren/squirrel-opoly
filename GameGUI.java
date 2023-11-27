@@ -1,11 +1,12 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -16,23 +17,37 @@ public class GameGUI extends JFrame implements KeyListener
 	private static final int F_WIDTH = 799, F_HEIGHT = 799;
 	private static final int HORIZ_BORDER = 53, VERT_BORDER = 53;
 	private static final String GAME_NAME = "Squirrel-opoly";
-	private static final Color[] COLORS = {Color.BLUE, Color.GRAY, Color.ORANGE, Color.MAGENTA};
+	private static final Color[] COLORS = {Color.BLUE, Color.GRAY, Color.ORANGE, Color.MAGENTA, Color.CYAN, Color.RED, Color.YELLOW};
 	private final Color DEFAULT_BACKGROUND_COLOR;
 	
 	private final int BOARD_SPACE_DIM, NUM_SPACES;
 	private boolean inPlay;
 	private int[] positions = {0,0,0,0};
+	private String[] playerNames;
+	private Color[] gameColors = new Color[4];
 	
-	public GameGUI(int numSpaces)
+	public GameGUI(int numSpaces, String[] names)
 	{
 		super(GAME_NAME);
+		playerNames = names;
+		ArrayList<Color> allColors = new ArrayList<Color>();
+		for(Color c : COLORS)
+		{
+			allColors.add(c);
+		}
+		Random rand = new Random();
+		for(int i = 0; i < gameColors.length; i++)
+		{
+			gameColors[i] = allColors.remove(Math.abs(rand.nextInt()) % allColors.size());
+		}
+		
 		DEFAULT_BACKGROUND_COLOR = this.getBackground();
 		
 		BOARD_SPACE_DIM = (F_WIDTH - (2 * HORIZ_BORDER)) / (numSpaces / 4 + 1);
 		NUM_SPACES = numSpaces;
 		inPlay = false;
 		//set customizable settings of Frame
-		setPreferredSize(new Dimension(F_WIDTH, F_HEIGHT));
+		setPreferredSize(new Dimension(F_WIDTH + 250, F_HEIGHT));
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		GameGUI gui = this;
@@ -63,11 +78,10 @@ public class GameGUI extends JFrame implements KeyListener
 		if(inPlay)
 		{
 			freshStart(phics);
-			System.out.println("1");
 			drawBoard(phics);
-			System.out.println("2");
+			drawKey(phics);
+			
 			drawFigures(phics);
-			System.out.println("3");
 		}
 	}
 	
@@ -111,20 +125,40 @@ public class GameGUI extends JFrame implements KeyListener
 	}
 	
 	private void drawFigures(Graphics phics)
-	{
-		/*Random rand = new Random();
-		int randSpace = Math.abs(rand.nextInt()) % NUM_SPACES;
-		System.out.println("Space #: " + randSpace);*/
-		
+	{	
 		System.out.println("GameGUI.drawFigures():");
 		for(int playerID = 0; playerID < 4; playerID++)
 		{
 			int[] ulc = spaceToCoordPair(positions[playerID]);
 			
 			System.out.println("\tPlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
-			phics.setColor(COLORS[playerID]);
+			phics.setColor(gameColors[playerID]);
 			phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 		}
+	}
+	
+	//draws the key denoting which player corresponds to which colored square on the game-GUI
+	private void drawKey(Graphics phics)
+	{
+		//writes the label for the "Color Key" title
+		phics.setColor(Color.black);
+		phics.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		phics.drawString("COLOR KEY", HORIZ_BORDER + (NUM_SPACES/4 + 1)*BOARD_SPACE_DIM + 50, 3 * VERT_BORDER);
+		
+		int ulcX = (NUM_SPACES/4 + 1) * BOARD_SPACE_DIM + 50;
+		for(int i = 0; i < positions.length; i++)
+		{
+			//draws the colored square for this player
+			int ulcY = 50 + i * 80;
+			phics.setColor(gameColors[i]);
+			phics.fillRect(HORIZ_BORDER + ulcX + 1, 3 * VERT_BORDER + ulcY + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+			
+			//writes out the corresponding player name
+			phics.setColor(Color.DARK_GRAY);
+			phics.setFont(new Font("Arial", Font.PLAIN, 17));
+			phics.drawString(playerNames[i], HORIZ_BORDER + ulcX + 2 * BOARD_SPACE_DIM, 3 * VERT_BORDER + ulcY + BOARD_SPACE_DIM - 5);
+		}
+		
 	}
 	
 	private int[] spaceToCoordPair(int spaceNum)
