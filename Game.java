@@ -196,7 +196,6 @@ public class Game
 						}
 						else	//exchange your food for freedom
 						{
-							Random rand = new Random();
 							boolean satisfactory = (turnPlayer.getCurrentFood() >= rollDie()/2);
 							turnPlayer.setFoodUnits(0);
 							
@@ -253,15 +252,13 @@ public class Game
 				
 				turnPlayer.incrementMoves();
 				
-				//String proceedString = "";
-				//if(passProceed)
-				//	proceedString = passProceed(turnPlayer);
-				//passProceed method works in 4 parts: (1) allow user to regain health OR find __ food units; 
-				// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature;
-				// (3) add points for successful trip around AND (4) return a String summarizing what happened as a result of passing Proceed
+				if(passProceed)
+				{
+					passProceed(turnPlayer);
+				}	
 				
 				//announce where the player is on the gameboard
-				System.out.println(/*proceedString +*/ turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
+				System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
 				
 				//if the space is occupied by another player, 
 				if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
@@ -302,9 +299,61 @@ public class Game
 		//System.out.println("end of turn");
 	}
 	
-	private int applyAnimalControlEscape(SquirrelPlayer player)
+	private void passProceed(SquirrelPlayer player)
 	{
-		return rollDice(2, player);
+		player.incrementLapsCompleted();
+		
+		boolean restoreHealth;
+		
+		if(player.isUserPlayer())
+		{
+			Object[] choices = {"Restore health", "Load up on food"};
+			restoreHealth = JOptionPane.showOptionDialog(gameDisplay, player.getName() + " passed the PROCEED space. Choose one of the following benefits to aid you on your journey:", player.getName() + " passed PROCEED!", 
+					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
+		}
+		else
+		{
+			if(player.getCurrentHealth() < player.getMyMaxHealth())
+			{
+				if(player.getMyMaxHealth() < SquirrelPlayer.getAllSquirrelMaxHealth() ||
+						((double)player.getCurrentHealth())/player.getMyMaxHealth() < 0.8)
+				{
+					restoreHealth = true;
+				}
+				else
+				{
+					if(player.getCurrentFood() == player.getMaxFoodCapacity())
+						restoreHealth = true;
+					else
+					{
+						if(player.getCurrentFood() <= 1)
+							restoreHealth = false;
+						else
+						{
+							Random rand = new Random();
+							restoreHealth = rand.nextBoolean();
+						}
+					}
+				}
+			}
+			else
+				restoreHealth = false;
+		}
+		
+		if(restoreHealth)
+		{
+			player.setCurrentHealth(player.getMyMaxHealth());
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has passed PROCEED and has decided to " +
+					"restore " + player.getPossessivePronoun() + " health.");
+		}
+		else
+		{
+			player.setFoodUnits(player.getMaxFoodCapacity());
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has passed PROCEED and has decided to " +
+					"restock " + player.getPossessivePronoun() + " carried food stores.");
+		}
+		//passProceed method works in 2 parts: (1) allow user to regain health OR find __ food units; 
+		// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature)
 	}
 	
 	private void apprehend(SquirrelPlayer player)

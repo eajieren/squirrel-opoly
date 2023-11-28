@@ -23,7 +23,7 @@ public class SquirrelPlayer
 	
 	private String myName;
 	private boolean isUserPlayer, isImpounded, sexuallyMature, isTrapped;
-	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth;
+	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth, lapsCompleted;
 	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves, trapTurns, totalTrapTurns, impoundTurns;
 	private Gender myGender;
 	
@@ -39,6 +39,7 @@ public class SquirrelPlayer
 		foodUnitCarryingCapacity = MAX_FOOD - 1;
 		currentFoodUnits = STARTING_FOOD;
 		doublesRolled = gamePosition = numMoves = trapTurns = totalTrapTurns = impoundTurns = 0;
+		lapsCompleted = 0;
 		if(male)
 			myGender = Gender.MALE;
 		else
@@ -48,25 +49,6 @@ public class SquirrelPlayer
 	public String getName()
 	{
 		return myName;
-	}
-	
-	public String getSubjectPronoun(boolean uppercase)
-	{
-		switch(myGender)
-		{
-			case FEMALE:
-				if(uppercase)
-				{
-					return "She";
-				}
-				return "she";
-			default:
-				if(uppercase)
-				{
-					return "He";
-				}
-				return "he";
-		}
 	}
 	
 	public String getObjectPronoun()
@@ -126,9 +108,33 @@ public class SquirrelPlayer
 		return doublesRolled;
 	}
 	
+	public String getSubjectPronoun(boolean uppercase)
+	{
+		switch(myGender)
+		{
+			case FEMALE:
+				if(uppercase)
+				{
+					return "She";
+				}
+				return "she";
+			default:
+				if(uppercase)
+				{
+					return "He";
+				}
+				return "he";
+		}
+	}
+
 	public int getCurrentFood()
 	{
 		return currentFoodUnits;
+	}
+	
+	public int getMaxFoodCapacity()
+	{
+		return foodUnitCarryingCapacity;
 	}
 	
 	public int getCurrentHealth()
@@ -161,6 +167,11 @@ public class SquirrelPlayer
 		return isTrapped;
 	}
 	
+	public boolean isSexuallyMature()
+	{
+		return sexuallyMature;
+	}
+	
 	//advances the player numSpcs spaces and returns true if the player passes go while moving forward
 	public boolean advanceSpaces(int numSpcs, int totalBoardSpcs)
 	{
@@ -185,6 +196,19 @@ public class SquirrelPlayer
 	public void incrementMoves()
 	{
 		numMoves++;
+	}
+	
+	public void incrementLapsCompleted()
+	{
+		lapsCompleted++;
+		
+		if(!sexuallyMature)
+			sexuallyMature = !sexuallyMature;
+	}
+	
+	public int getNumLapsCompleted()
+	{
+		return lapsCompleted;
 	}
 	
 	public void setTotalTrapTurns(int totalTrapped)
@@ -270,5 +294,10 @@ public class SquirrelPlayer
 			default:
 				return "his";
 		}
+	}
+	
+	public static int getAllSquirrelMaxHealth()
+	{
+		return MAX_HEALTH;
 	}
 }
