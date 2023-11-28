@@ -24,7 +24,7 @@ public class SquirrelPlayer
 	private String myName;
 	private boolean isUserPlayer, isImpounded, sexuallyMature, isTrapped;
 	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth;
-	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves, trapTurns, totalTrapTurns;
+	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves, trapTurns, totalTrapTurns, impoundTurns;
 	private Gender myGender;
 	
 	public SquirrelPlayer(String name, boolean userPlayer, boolean male)
@@ -38,7 +38,7 @@ public class SquirrelPlayer
 		currentHealth = myMaxHealth = MAX_HEALTH;
 		foodUnitCarryingCapacity = MAX_FOOD - 1;
 		currentFoodUnits = STARTING_FOOD;
-		doublesRolled = gamePosition = numMoves = trapTurns = totalTrapTurns = 0;
+		doublesRolled = gamePosition = numMoves = trapTurns = totalTrapTurns = impoundTurns = 0;
 		if(male)
 			myGender = Gender.MALE;
 		else
@@ -50,14 +50,54 @@ public class SquirrelPlayer
 		return myName;
 	}
 	
+	public String getSubjectPronoun(boolean uppercase)
+	{
+		switch(myGender)
+		{
+			case FEMALE:
+				if(uppercase)
+				{
+					return "She";
+				}
+				return "she";
+			default:
+				if(uppercase)
+				{
+					return "He";
+				}
+				return "he";
+		}
+	}
+	
+	public String getObjectPronoun()
+	{
+		switch(myGender)
+		{
+			case FEMALE:
+				return "her";
+			default:
+				return "him";
+		}
+	}
+	
 	public int getGamePosition()
 	{
 		return gamePosition;
 	}
 	
+	public void setGamePosition(int pos)
+	{
+		gamePosition = pos;
+	}
+	
 	public boolean isUserPlayer()
 	{
 		return isUserPlayer;
+	}
+	
+	public int getImpoundTurns()
+	{
+		return impoundTurns;
 	}
 	
 	//returns whether or not the player is in the custody of Animal Control
@@ -84,6 +124,11 @@ public class SquirrelPlayer
 	public int getNumDoublesRolled()
 	{
 		return doublesRolled;
+	}
+	
+	public int getCurrentFood()
+	{
+		return currentFoodUnits;
 	}
 	
 	public int getCurrentHealth()
@@ -152,6 +197,11 @@ public class SquirrelPlayer
 		trapTurns++;
 	}
 	
+	public void incrementImpoundTurns()
+	{
+		impoundTurns++;
+	}
+	
 	//NOT DONE
 	public void setCurrentHealth(int healthInt)
 	{
@@ -163,6 +213,11 @@ public class SquirrelPlayer
 			
 			JOptionPane.showMessageDialog(null, myName + " has lost all health points and is now dead.");
 		}
+	}
+	
+	public void setFoodUnits(int food)
+	{
+		currentFoodUnits = food;
 	}
 	
 	public void setTrappedStatus(boolean status)
@@ -193,6 +248,7 @@ public class SquirrelPlayer
 	public void setImpoundStatus(boolean impoundStatus)
 	{
 		isImpounded = impoundStatus;
+		impoundTurns = 0;
 	}
 	
 	public void incrementDoubles()
@@ -203,5 +259,16 @@ public class SquirrelPlayer
 	public void zeroOutDoubles()
 	{
 		doublesRolled = 0;
+	}
+
+	public String getPossessivePronoun()
+	{
+		switch(myGender)
+		{
+			case FEMALE:
+				return "her";
+			default:
+				return "his";
+		}
 	}
 }

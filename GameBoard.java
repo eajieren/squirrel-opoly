@@ -5,7 +5,7 @@ import java.util.Random;
 public class GameBoard
 {
 	private final int NUM_SPACES, DEFAULT_SMALL = 40, DEFAULT_LARGE = 80;
-	private final String[] cornerCodes = {"PROC", "ACES", "ANCO"},
+	private final String[] cornerCodes = {"PROC", "ACOV", "ANCO"},
 			parkCodes = {"PRKA", "PRKB", "PRKC", "PRKD"};
 	//private String[] spcToLocationCode;
 	private GameSpace[] spaces;
@@ -52,6 +52,16 @@ public class GameBoard
 			return null;
 		else
 			return spaces[spaceNum];
+	}
+	
+	public int getAnimalControlSpaceNum()
+	{
+		return NUM_SPACES/2;
+	}
+	
+	public int getOverflowSpaceNum()
+	{
+		return NUM_SPACES/4;
 	}
 	
 	private void setup(ArrayList<String> treeNames)

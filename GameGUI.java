@@ -129,29 +129,33 @@ public class GameGUI extends JFrame implements KeyListener
 		System.out.println("GameGUI.drawFigures():");
 		for(int playerID = 0; playerID < 4; playerID++)
 		{
-			int[] ulc = spaceToCoordPair(positions[playerID]);
+			if(positions[playerID] >= 0)
+			{
+				int[] ulc = spaceToCoordPair(positions[playerID]);
 			
-			System.out.println("\tPlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
-			phics.setColor(gameColors[playerID]);
-			phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+				System.out.println("\tPlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
+				phics.setColor(gameColors[playerID]);
+				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+			}
 		}
 	}
 	
 	//draws the key denoting which player corresponds to which colored square on the game-GUI
 	private void drawKey(Graphics phics)
 	{
+		int OFFSET = 50;
 		//writes the label for the "Color Key" title
 		phics.setColor(Color.black);
 		phics.setFont(new Font("Times New Roman", Font.BOLD, 25));
 		phics.drawString("COLOR KEY", HORIZ_BORDER + (NUM_SPACES/4 + 1)*BOARD_SPACE_DIM + 50, 3 * VERT_BORDER);
 		
-		int ulcX = (NUM_SPACES/4 + 1) * BOARD_SPACE_DIM + 50;
+		int ulcX = (NUM_SPACES/4 + 1) * BOARD_SPACE_DIM + OFFSET;
 		for(int i = 0; i < positions.length; i++)
 		{
 			//draws the colored square for this player
-			int ulcY = 50 + i * 80;
+			int ulcY = OFFSET + i * 80;
 			phics.setColor(gameColors[i]);
-			phics.fillRect(HORIZ_BORDER + ulcX + 1, 3 * VERT_BORDER + ulcY + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+			phics.fillRect(HORIZ_BORDER + ulcX, 3 * VERT_BORDER + ulcY + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 			
 			//writes out the corresponding player name
 			phics.setColor(Color.DARK_GRAY);

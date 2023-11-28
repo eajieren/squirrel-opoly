@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 public class Game
 {
-	private final int NUM_PLAYERS = 4;
+	private final int NUM_PLAYERS = 4, IMPOUND_ESCAPE_LIMIT = 3;
 	private GameBoard myBoard;
 	private GameGUI gameDisplay;
 	private ArrayList<SquirrelPlayer> players;
@@ -111,101 +111,229 @@ public class Game
 	
 	private void giveTurn(SquirrelPlayer turnPlayer)
 	{
-		boolean exit;
-		do
+		if(turnPlayer.isAlive())
 		{
-			Object[] choices = {"OK", "EXIT"};
-			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.", "Proceed to " + turnPlayer.getName() + "\'s turn", 
-					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
-			if(exit)
+			boolean exit;
+			do
 			{
-				if(GameGUI.exit(gameDisplay))
-					System.exit(0);
-			}
-		}
-		while(exit);
-		
-		do
-		{
-			if(turnPlayer.getTrappedStatus() == true)
-			{
-				turnPlayer.incrementTrapTurns();
-				if(turnPlayer.getTrapTurns() > turnPlayer.getTotalTrapTurns())
+				Object[] choices = {"OK", "EXIT"};
+				exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.", "Proceed to " + turnPlayer.getName() + "\'s turn", 
+						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
+				if(exit)
 				{
-					turnPlayer.setTrappedStatus(false);
-					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has been released from the trap and may now resume regular turns.");
+					if(GameGUI.exit(gameDisplay))
+						System.exit(0);
 				}
-				else
+			}
+			while(exit);
+			
+			do
+			{
+				if(turnPlayer.getTrappedStatus() == true)
 				{
-					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is stuck in a live trap and skips turn " + turnPlayer.getTrapTurns() +
-							" of " + turnPlayer.getTotalTrapTurns() + ".");
+					turnPlayer.incrementTrapTurns();
+					if(turnPlayer.getTrapTurns() > turnPlayer.getTotalTrapTurns())
+					{
+						turnPlayer.setTrappedStatus(false);
+						JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has been released from the trap and may now resume regular turns.");
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is stuck in a live trap and skips turn " + turnPlayer.getTrapTurns() +
+								" of " + turnPlayer.getTotalTrapTurns() + ".");
+						break;
+					}
+				}
+				
+				if(turnPlayer.isImpounded())
+				{
+					if(turnPlayer.getImpoundTurns() >= IMPOUND_ESCAPE_LIMIT)
+					{
+						turnPlayer.setImpoundStatus(false);
+						turnPlayer.setFoodUnits(0);
+						JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has been freed by the Free Nibblers movement. All of your on-hand food was jettisoned in your escape.");
+					}
+					else
+					{
+						//you're in animal control custody
+						boolean escape;
+						
+						if(turnPlayer.isUserPlayer())
+						{
+							String premise = turnPlayer.getName() + " is in Animal Control custody. Please select how you will proceed.";
+							
+							//allow player to decide to escape or wait
+							Object[] choices = {"Attempt to escape", "Exchange all food for freedom"};
+							escape = JOptionPane.showOptionDialog(gameDisplay, premise, turnPlayer.getName() + " in Animal Control custody!", 
+									JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
+						}
+						else
+						{
+							if(turnPlayer.getCurrentFood() > 1)
+							{
+								Random rand = new Random();
+								escape = rand.nextBoolean();
+							}
+							else
+								escape = true;
+						}
+						
+						if(escape)
+						{
+							rollDice(2, turnPlayer);
+							
+							//successful escape
+							if(turnPlayer.getNumDoublesRolled() > 0)
+							{
+								turnPlayer.zeroOutDoubles();
+								turnPlayer.setImpoundStatus(false);
+							}
+							else	//unsuccessful escape
+							{
+								turnPlayer.incrementImpoundTurns();
+								break;
+							}
+						}
+						else	//exchange your food for freedom
+						{
+							Random rand = new Random();
+							boolean satisfactory = (turnPlayer.getCurrentFood() >= rollDie()/2);
+							turnPlayer.setFoodUnits(0);
+							
+							if(satisfactory)
+							{
+								turnPlayer.setImpoundStatus(false);
+								JOptionPane.showMessageDialog(gameDisplay, "The Squirrel Mafia was satisfied with the food offering " + 
+										turnPlayer.getName() + " made. They have secured " + turnPlayer.getPossessivePronoun() + " freedom.");
+							}
+							else
+							{
+								int injurySum = rollDie() + rollDie();
+								turnPlayer.setCurrentHealth(turnPlayer.getCurrentHealth() - injurySum);
+								JOptionPane.showMessageDialog(gameDisplay, "Unfortunately, the Squirrel Mafia was unimpressed with the food offering " + 
+										turnPlayer.getName() + " made. They took all of " + turnPlayer.getPossessivePronoun() + " food and beat " +
+										turnPlayer.getObjectPronoun() + " for " + injurySum + " health points.");
+								turnPlayer.incrementImpoundTurns();
+								break;
+							}
+						}
+						
+						
+						//you can attempt to escape; if you fail this time, you'll suffer health points of 1/2 the sum you roll; if you escape, you'll move the sum past your place of custody
+						//or you can pay your way out with 2 food units and roll 1 die to determine where you'll go
+						
+						break;
+					}					
+				}
+				//if (turnPlayer.getNumMoves() + 1) % eatingFrequency == 0
+				//if(turnPlayer.getFoodUnits() >= baseMetabolism)
+				//{give opportunity to forage, advance, dig for buried nuts, } else {player must forage}
+				
+				//get the roll for this player with 2 dice
+				int rollResult = rollDice(2, turnPlayer);
+				
+				JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
+				clearScreen(gameDisplay);
+				
+				if(turnPlayer.getNumDoublesRolled() > 2)
+				{
+					turnPlayer.zeroOutDoubles();
+					
+					//send SquirrelPlayer to Animal Control
+					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has rolled 3 consecutive doubles while navigating. " + turnPlayer.getSubjectPronoun(true) + " pestered the wrong bird-feeder and has been apprehended by Animal Control.");
+					apprehend(turnPlayer);
+					
 					break;
 				}
-			}
-			//if (turnPlayer.getNumMoves() + 1) % eatingFrequency == 0
-			//if(turnPlayer.getFoodUnits() >= baseMetabolism)
-			//{give opportunity to forage, advance, dig for buried nuts, } else {player must forage}
-			
-			//get the roll for this player with 2 dice
-			int rollResult = rollDice(2, turnPlayer);
-			
-			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
-			clearScreen(gameDisplay);
-			
-			if(turnPlayer.getNumDoublesRolled() > 2)
-			{
-				//send SquirrelPlayer to Animal Control
-				break;
-			}
-			
-			//update the move within the Player, on the board, and in the game, checking to see whether it's occupied
-			boolean passProceed = turnPlayer.advanceSpaces(rollResult, myBoard.getNumSpaces());
-			
-			gameDisplay.updateMyPosition(turnPlayer);
-			
-			turnPlayer.incrementMoves();
-			
-			//String proceedString = "";
-			//if(passProceed)
-			//	proceedString = passProceed(turnPlayer);
-			//passProceed method works in 4 parts: (1) allow user to regain health OR find __ food units; 
-			// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature;
-			// (3) add points for successful trip around AND (4) return a String summarizing what happened as a result of passing Proceed
-			
-			//announce where the player is on the gameboard
-			System.out.println(/*proceedString +*/ turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
-			
-			//if the space is occupied by another player, 
-			if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
-			{
-				//we give the opportunity for breeding if opposite genders
-				//You've found a potential mate! Wanna get squirrelly?
-				//In order to breed: (1) genders must be opposite (2) both players must have passed Proceed once
-				//					(3)8/(365*4+1) chance
 				
-				//bounce-off, as we never have 2 squirrels in the same space
-			}
-			else	//the space is open,
-			{
-				GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
-				if(space instanceof LiveTrap)
+				//update the move within the Player, on the board, and in the game, checking to see whether it's occupied
+				boolean passProceed = turnPlayer.advanceSpaces(rollResult, myBoard.getNumSpaces());
+				
+				gameDisplay.updateMyPosition(turnPlayer);
+				
+				turnPlayer.incrementMoves();
+				
+				//String proceedString = "";
+				//if(passProceed)
+				//	proceedString = passProceed(turnPlayer);
+				//passProceed method works in 4 parts: (1) allow user to regain health OR find __ food units; 
+				// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature;
+				// (3) add points for successful trip around AND (4) return a String summarizing what happened as a result of passing Proceed
+				
+				//announce where the player is on the gameboard
+				System.out.println(/*proceedString +*/ turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
+				
+				//if the space is occupied by another player, 
+				if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
 				{
-					((LiveTrap) space).applyEvent(turnPlayer, gameDisplay);
+					//we give the opportunity for breeding if opposite genders
+					//You've found a potential mate! Wanna get squirrelly?
+					//In order to breed: (1) genders must be opposite (2) both players must have passed Proceed once
+					//					(3)8/(365*4+1) chance
+					
+					//bounce-off, as we never have 2 squirrels in the same space
 				}
-				//apply the square's actions on this player
-				//if it's a residence space, the person should be offered the chance to:
-				//(1) claim as theirs if it's not owned and they have number of food units required
-				//(2) forage
-				//(3) rest in drey (if it's yours)
-				//(4) bury food
+				else	//the space is open,
+				{
+					GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
+					if(space instanceof LiveTrap)
+					{
+						((LiveTrap) space).applyEvent(turnPlayer, gameDisplay);
+					}
+					//apply the square's actions on this player
+					//if it's a residence space, the person should be offered the chance to:
+					//(1) claim as theirs if it's not owned and they have number of food units required
+					//(2) forage
+					//(3) rest in drey (if it's yours)
+					//(4) bury food
+				}
+				
+				System.out.println("Game.giveTurn: " + turnPlayer.getName() + " " + turnPlayer.getGamePosition());
 			}
-			
-			System.out.println("Game.giveTurn: " + turnPlayer.getName() + " " + turnPlayer.getGamePosition());
+			while(turnPlayer.getNumDoublesRolled() > 0);
 		}
-		while(turnPlayer.getNumDoublesRolled() > 0);
+		else
+		{
+			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is no longer with us. RIP.");
+		}
+		
 		
 		//COMMENT FOR DEBUGGING:
 		//System.out.println("end of turn");
+	}
+	
+	private int applyAnimalControlEscape(SquirrelPlayer player)
+	{
+		return rollDice(2, player);
+	}
+	
+	private void apprehend(SquirrelPlayer player)
+	{		
+		//if animal control space is open, move player to this space
+		if(spaceClearFor(myBoard.getAnimalControlSpaceNum(), player))
+		{
+			player.setImpoundStatus(true);
+			player.setGamePosition(myBoard.getAnimalControlSpaceNum());
+			gameDisplay.updateMyPosition(player);
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " is being held at the Animal Control facility.");
+		}
+		else
+		{
+			if(spaceClearFor(myBoard.getOverflowSpaceNum(), player))
+			{
+				player.setImpoundStatus(true);
+				player.setGamePosition(myBoard.getOverflowSpaceNum());
+				gameDisplay.updateMyPosition(player);
+				JOptionPane.showMessageDialog(gameDisplay, player.getName() + " is being held at the Animal Control Overflow facility.");
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(gameDisplay, "There was no space at Animal Control facilities. " + player.getName() + " has been put down by Animal Control.");
+				player.setCurrentHealth(0);
+				player.setGamePosition(-1);
+				gameDisplay.updateMyPosition(player);
+			}
+		}
 	}
 	
 	/*
