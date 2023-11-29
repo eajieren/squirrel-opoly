@@ -1,0 +1,58 @@
+AT/found buried acorns/3
+AT/dropped acorns/-2
+AT/found an accessible bird-feeder/3
+AT/found food in trash-can/1
+AT/had food spoil/-1
+AT/grazed in a suburban garden/2
+AT/robbed by wild highway squirrels/-3
+AT/narrowly escaped from a hungry raccoon/-1
+AT/stumbled upon a fruiting pecan tree/3
+AT/ate a beetle/1
+4LE/Go to Animal Control/40
+4LE/Go to Animal Control Overflow/20
+4LE/Go to Park A/10
+4LE/Go to Park B/30
+4LE/Go to Park C/50
+4LE/Go to Park D/70
+4LE/Go to Human Home/4
+4LE/Go to Human Home/14
+4LE/Go to Human Home/24
+4LE/Go to Human Home/34
+4LE/Go to Human Home/44
+4LE/Go to Human Home/54
+4LE/Go to Human Home/64
+4LE/Go to Human Home/74
+4LE/Go to Adventure/5
+4LE/Go to Adventure/15
+4LE/Go to Adventure/25
+4LE/Go to Adventure/35
+4LE/Go to Adventure/45
+4LE/Go to Adventure/55
+4LE/Go to Adventure/65
+4LE/Go to Adventure/75
+4LE/Run away from a cat; go back 5 spaces/-5
+4LE/Escape from an owl; go back 3 spaces/-3
+4LE/Chased by a dog; go forward 2 spaces/+2
+4LE/Apprehended by Animal Control/0
+4LE/Apprehended by Animal Control/0
+4LE/Go to Space 1/1
+4LE/Go to Space 21/21
+4LE/Go to Space 41/41
+4LE/Go to Space 61/61
+4LE/Go to nearby unoccupied space/0
+4LE/Go to nearby unoccupied space/0
+DoD/Fleas infect your drey/-5
+DoD/Snake bite/-5
+DoD/Cared for by a conservatory/+8
+DoD/One of descendant squirrels passes away/-1
+DoD/Ringworm/-3
+DoD/Enjoy a nice day with temperate weather/3
+DoD/Hit by moving car/-10
+DoD/Swiped at by a cat/-2
+DoD/squirrel kittens eaten by a raccoon/-2
+DoD/Caught paw in snap-trap/-8
+DoD/find a cozy, abandoned tree hollow to stay at/+4
+DoD/find an elixir/+5
+DoD/drink water from a birdbath/+1
+DoD/hit by a falling tree bough/-2
+DoD/lose a squirrel kitten to illness/-1

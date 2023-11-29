@@ -80,7 +80,6 @@ public class GameGUI extends JFrame implements KeyListener
 			freshStart(phics);
 			drawBoard(phics);
 			drawKey(phics);
-			
 			drawFigures(phics);
 		}
 	}
@@ -126,14 +125,13 @@ public class GameGUI extends JFrame implements KeyListener
 	
 	private void drawFigures(Graphics phics)
 	{	
-		System.out.println("GameGUI.drawFigures():");
 		for(int playerID = 0; playerID < 4; playerID++)
 		{
 			if(positions[playerID] >= 0)
 			{
+				//upper-left corner pixel coordinates
 				int[] ulc = spaceToCoordPair(positions[playerID]);
-			
-				System.out.println("\tPlayerID " + playerID + " @ (" + ulc[0] + ", " + ulc[1] + ")");
+				
 				phics.setColor(gameColors[playerID]);
 				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 			}

@@ -20,6 +20,13 @@ public class Squirrelopoly
 		GameBoard board = new GameBoard(false, oklahomaTrees);
 		System.out.println("Game board size: " + board.getNumSpaces() + " spaces");
 		
+		String cardFilePath = "src/" + board.getNumSpaces() + "spcCards.txt";
+		//System.out.println("card file path: " + cardFilePath);
+		ArrayList<String> cardInput = textFileToArrayList(cardFilePath);
+		/*for(String cardLine : cardInput)
+			System.out.println(cardLine);*/
+		DeckManager decks = new DeckManager(cardInput);
+		
 		//prompt user for # user players
 		int numUserPlayers = getNumPlayers();
 		System.out.println("Thank you for deciding on " + numUserPlayers + " user players!");

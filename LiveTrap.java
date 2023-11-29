@@ -24,6 +24,8 @@ public class LiveTrap extends EventSpace
 		}
 		else
 		{
+			JOptionPane.showMessageDialog(display, player.getName() + " has been caught in a live rat trap. " +
+					player.getSubjectPronoun(true) + " can now decide to attempt an escape or to wait to be released.");
 			Random rand = new Random();
 			escape = rand.nextBoolean();
 		}
@@ -59,7 +61,7 @@ public class LiveTrap extends EventSpace
 					
 		//roll dice for damage
 		Random rand = new Random();
-		int damage = firstRoll[0] + rand.nextInt() % secondRoll[0];
+		int damage = firstRoll[0] + Math.abs(rand.nextInt()) % secondRoll[0];
 					
 		JOptionPane.showMessageDialog(display, player.getName() + " escaped! Injury level was calculated as " + damage + " health point(s) out of your total of " +
 			player.getCurrentHealth() + " health points.");
