@@ -10,22 +10,19 @@ import javax.swing.JOptionPane;
 
 public class Squirrelopoly
 {
-	public static final int TOTAL_NUM_PLAYERS = 4;
+	public static final int TOTAL_NUM_PLAYERS = 4, NUM_SPACES = 80;
 	
 	public static void main(String[] args)
 	{
+		String cardFilePath = "src/" + NUM_SPACES + "spcCards.txt";
+		ArrayList<String> cardInput = textFileToArrayList(cardFilePath);
+		DeckManager decks = new DeckManager(cardInput);
+		
 		//intro
 		System.out.println("Welcome to Squirrelopoly!");
 		ArrayList<String> oklahomaTrees = textFileToArrayList("src/TreesOfOK.txt");
-		GameBoard board = new GameBoard(false, oklahomaTrees);
+		GameBoard board = new GameBoard(NUM_SPACES == 40, decks, oklahomaTrees);
 		System.out.println("Game board size: " + board.getNumSpaces() + " spaces");
-		
-		String cardFilePath = "src/" + board.getNumSpaces() + "spcCards.txt";
-		//System.out.println("card file path: " + cardFilePath);
-		ArrayList<String> cardInput = textFileToArrayList(cardFilePath);
-		/*for(String cardLine : cardInput)
-			System.out.println(cardLine);*/
-		DeckManager decks = new DeckManager(cardInput);
 		
 		//prompt user for # user players
 		int numUserPlayers = getNumPlayers();

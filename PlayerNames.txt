@@ -1,5 +1,6 @@
 Jumper,M
 Fuzz-Buzz,M
+Lana,F
 Peanut,M
 Rocko,M
 Rory,F

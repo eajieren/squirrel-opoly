@@ -1,12 +1,12 @@
 
 public class PassiveEventSpace extends EventSpace
 {
-	public PassiveEventSpace(String code)
+	public PassiveEventSpace(String code, int spcNum)
 	{
-		super(code);
+		super(code, spcNum);
 	}
 	
-	public void applyEvent(SquirrelPlayer player, GameGUI display)
+	public void applyEvent(SquirrelPlayer player, Game currentGame)
 	{
 	}
 }

@@ -6,13 +6,14 @@ public class LiveTrap extends EventSpace
 {
 	private final String premise = "You've been caught in a live rat trap. You can choose to either escape and risk injury or wait until you're released.";
 	
-	public LiveTrap()
+	public LiveTrap(int spcNum)
 	{
-		super("LVTP");
+		super("LVTP", spcNum);
 	}
 	
-	public void applyEvent(SquirrelPlayer player, GameGUI display)
+	public void applyEvent(SquirrelPlayer player, Game currentGame)
 	{	
+		GameGUI display = currentGame.getDisplay();
 		boolean escape;
 		
 		if(player.isUserPlayer())
@@ -32,7 +33,7 @@ public class LiveTrap extends EventSpace
 			
 		if(escape)
 		{
-			applyEscape(player, display);
+			applyEscape(player, currentGame);
 		}
 		else
 		{
@@ -40,8 +41,10 @@ public class LiveTrap extends EventSpace
 		}
 	}
 	
-	private void applyEscape(SquirrelPlayer player, GameGUI display)
+	private void applyEscape(SquirrelPlayer player, Game currentGame)
 	{
+		GameGUI display = currentGame.getDisplay();
+		
 		if(player.isUserPlayer())
 		{
 			JOptionPane.showMessageDialog(display, player.getName() + ": You've chosen to escape! You'll now roll one die and then another in order to calculate the damage " +
@@ -66,7 +69,7 @@ public class LiveTrap extends EventSpace
 		JOptionPane.showMessageDialog(display, player.getName() + " escaped! Injury level was calculated as " + damage + " health point(s) out of your total of " +
 			player.getCurrentHealth() + " health points.");
 					
-		player.setCurrentHealth(player.getCurrentHealth() - damage);
+		player.setCurrentHealth(player.getCurrentHealth() - damage, currentGame);
 	}
 	
 	private void applyWait(SquirrelPlayer player, GameGUI display)

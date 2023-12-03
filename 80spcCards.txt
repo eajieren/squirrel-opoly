@@ -10,10 +10,10 @@ AT/stumbled upon a fruiting pecan tree/3
 AT/ate a beetle/1
 4LE/Go to Animal Control/40
 4LE/Go to Animal Control Overflow/20
-4LE/Go to Park A/10
-4LE/Go to Park B/30
-4LE/Go to Park C/50
-4LE/Go to Park D/70
+4LE/Go to Park/10
+4LE/Go to Park/30
+4LE/Go to Park/50
+4LE/Go to Park/70
 4LE/Go to Human Home/4
 4LE/Go to Human Home/14
 4LE/Go to Human Home/24
@@ -30,17 +30,17 @@ AT/ate a beetle/1
 4LE/Go to Adventure/55
 4LE/Go to Adventure/65
 4LE/Go to Adventure/75
-4LE/Run away from a cat; go back 5 spaces/-5
-4LE/Escape from an owl; go back 3 spaces/-3
-4LE/Chased by a dog; go forward 2 spaces/+2
+4LE/Run away from a cat; go back 5 spaces/-5/Yes
+4LE/Escape from an owl; go back 3 spaces/-3/Yes
+4LE/Chased by a dog; go forward 2 spaces/+2/Yes
 4LE/Apprehended by Animal Control/0
 4LE/Apprehended by Animal Control/0
 4LE/Go to Space 1/1
 4LE/Go to Space 21/21
 4LE/Go to Space 41/41
 4LE/Go to Space 61/61
-4LE/Go to nearby unoccupied space/0
-4LE/Go to nearby unoccupied space/0
+4LE/Go to nearby unoccupied & unowned residence space/0
+4LE/Go to nearby unoccupied & unowned residence space/0
 DoD/Fleas infect your drey/-5
 DoD/Snake bite/-5
 DoD/Cared for by a conservatory/+8
@@ -56,3 +56,4 @@ DoD/find an elixir/+5
 DoD/drink water from a birdbath/+1
 DoD/hit by a falling tree bough/-2
 DoD/lose a squirrel kitten to illness/-1
+DoD/tree is felled; lose a drey/-3

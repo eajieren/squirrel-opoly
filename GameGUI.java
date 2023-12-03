@@ -91,6 +91,22 @@ public class GameGUI extends JFrame implements KeyListener
 		repaint();
 	}
 	
+	public boolean isEmptyAt(int pos)
+	{
+		for(int playerPos : positions)
+		{
+			if(playerPos == pos)
+				return false;
+		}
+		
+		return true;
+	}
+	
+	public int getNumSpaces()
+	{
+		return NUM_SPACES;
+	}
+	
 	private void freshStart(Graphics phics)
 	{
 		phics.setColor(DEFAULT_BACKGROUND_COLOR);

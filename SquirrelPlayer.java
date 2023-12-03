@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 import javax.swing.JOptionPane;
 
 public class SquirrelPlayer
@@ -19,13 +22,15 @@ public class SquirrelPlayer
 	}
 	
 	private static int playerIDCounter = 0;
-	private static final int MAX_HEALTH = 20, MAX_FOOD = 3, STARTING_FOOD = 2;
+	private static final int MAX_HEALTH = 20, MAX_FOOD = 4, STARTING_FOOD = 2;
 	
+	private final double FOOD_CAPACITY_INCREASE_PROB = 0.75;
 	private String myName;
 	private boolean isUserPlayer, isImpounded, sexuallyMature, isTrapped;
 	private int myPlayerID, doublesRolled, gamePosition, myMaxHealth, currentHealth, lapsCompleted;
 	private int foodUnitCarryingCapacity, currentFoodUnits, numMoves, trapTurns, totalTrapTurns, impoundTurns;
 	private Gender myGender;
+	private ArrayList<ResidenceSpace> myDreys;
 	
 	public SquirrelPlayer(String name, boolean userPlayer, boolean male)
 	{
@@ -36,7 +41,7 @@ public class SquirrelPlayer
 		sexuallyMature = false;
 		isTrapped = false;
 		currentHealth = myMaxHealth = MAX_HEALTH;
-		foodUnitCarryingCapacity = MAX_FOOD - 1;
+		foodUnitCarryingCapacity = STARTING_FOOD;
 		currentFoodUnits = STARTING_FOOD;
 		doublesRolled = gamePosition = numMoves = trapTurns = totalTrapTurns = impoundTurns = 0;
 		lapsCompleted = 0;
@@ -44,22 +49,13 @@ public class SquirrelPlayer
 			myGender = Gender.MALE;
 		else
 			myGender = Gender.FEMALE;
+		
+		myDreys = new ArrayList<ResidenceSpace>();
 	}
 	
 	public String getName()
 	{
 		return myName;
-	}
-	
-	public String getObjectPronoun()
-	{
-		switch(myGender)
-		{
-			case FEMALE:
-				return "her";
-			default:
-				return "him";
-		}
 	}
 	
 	public int getGamePosition()
@@ -127,6 +123,17 @@ public class SquirrelPlayer
 		}
 	}
 
+	public String getObjectPronoun()
+	{
+		switch(myGender)
+		{
+			case FEMALE:
+				return "her";
+			default:
+				return "him";
+		}
+	}
+	
 	public int getCurrentFood()
 	{
 		return currentFoodUnits;
@@ -172,6 +179,39 @@ public class SquirrelPlayer
 		return sexuallyMature;
 	}
 	
+	public boolean inDrey()
+	{
+		for(ResidenceSpace drey : myDreys)
+		{
+			if(drey.getSpaceNum() == gamePosition)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public ArrayList<ResidenceSpace> getDreys()
+	{
+		return myDreys;
+	}
+	
+	public void addDrey(ResidenceSpace drey)
+	{
+		myDreys.add(drey);
+	}
+	
+	public void loseDrey(ResidenceSpace drey)
+	{
+		for(int i = 0; i < myDreys.size(); i++)
+		{
+			if(myDreys.get(i).getSpaceNum() == drey.getSpaceNum())
+			{
+				myDreys.remove(i);
+				break;
+			}
+		}
+	}
+	
 	//advances the player numSpcs spaces and returns true if the player passes go while moving forward
 	public boolean advanceSpaces(int numSpcs, int totalBoardSpcs)
 	{
@@ -193,6 +233,12 @@ public class SquirrelPlayer
 			return false;
 	}
 	
+	public void moveTo(int gamePos, GameGUI gui)
+	{
+		gamePosition = gamePos % gui.getNumSpaces();
+		gui.updateMyPosition(this);
+	}
+	
 	public void incrementMoves()
 	{
 		numMoves++;
@@ -204,6 +250,12 @@ public class SquirrelPlayer
 		
 		if(!sexuallyMature)
 			sexuallyMature = !sexuallyMature;
+		if(foodUnitCarryingCapacity != MAX_FOOD)
+		{
+			Random rand = new Random();
+			if(rand.nextDouble() < FOOD_CAPACITY_INCREASE_PROB)
+				foodUnitCarryingCapacity++;
+		}
 	}
 	
 	public int getNumLapsCompleted()
@@ -227,15 +279,20 @@ public class SquirrelPlayer
 	}
 	
 	//NOT DONE
-	public void setCurrentHealth(int healthInt)
+	public void setCurrentHealth(int healthInt, Game currentGame)
 	{
 		currentHealth = healthInt;
+		
+		if(currentHealth > myMaxHealth)
+			currentHealth = myMaxHealth;
 		
 		if(healthInt <= 0)
 		{
 			//all properties owned by this player are set back to owner=null
 			
 			JOptionPane.showMessageDialog(null, myName + " has lost all health points and is now dead.");
+			setGamePosition(-1);
+			currentGame.getDisplay().updateMyPosition(this);
 		}
 	}
 	
@@ -266,6 +323,10 @@ public class SquirrelPlayer
 		if(currentFoodUnits > foodUnitCarryingCapacity)
 		{
 			currentFoodUnits = foodUnitCarryingCapacity;
+		}
+		if(currentFoodUnits < 0)
+		{
+			currentFoodUnits = 0;
 		}
 	}
 	

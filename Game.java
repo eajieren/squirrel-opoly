@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 
 public class Game
 {
+	private final String RES_CLAIM = "CLAIM PROPERTY", RES_FORAGE = "FORAGE",
+			RES_BURY = "HIDE/BURY FOOD", RES_REST = "REST", RES_RAID = "TAKE-OVER PROPERTY";
+	
 	private final int NUM_PLAYERS = 4, IMPOUND_ESCAPE_LIMIT = 3;
 	private GameBoard myBoard;
 	private GameGUI gameDisplay;
@@ -35,8 +38,6 @@ public class Game
 		gameDisplay.setGameInPlay(true);
 		gameDisplay.pack();
 		gameDisplay.setVisible(true);
-		//reference comment; not meant to be uncommented
-		//int[] result = {rollDie(), rollDie(), rollDie()};
 		
 		int currentPlayerID = getFirstPlayerID();
 		
@@ -61,10 +62,20 @@ public class Game
 			* 	}
 			* }
 			*/
+			
+			//int[] points = calculatePoints();
 		}
 		
-		//int resultSum = rollDice(3, true);
-		//System.out.print("Dice Roll Sum = " + resultSum);
+	}
+	
+	public GameGUI getDisplay()
+	{
+		return gameDisplay;
+	}
+	
+	public GameBoard getBoard()
+	{
+		return myBoard;
 	}
 	
 	private int getFirstPlayerID()
@@ -111,68 +122,89 @@ public class Game
 	
 	private void giveTurn(SquirrelPlayer turnPlayer)
 	{
-		if(turnPlayer.isAlive())
+		System.out.println(turnPlayer.getName() + " turn# " + turnPlayer.getNumMoves());
+		boolean exit;
+		do
 		{
-			boolean exit;
-			do
+			Object[] choices = {"OK", "EXIT"};
+			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.\nFOOD: " + turnPlayer.getCurrentFood() + "/" + turnPlayer.getMaxFoodCapacity() + "\nHEALTH: " + turnPlayer.getCurrentHealth() + "/" + turnPlayer.getMyMaxHealth(), "Proceed to " + turnPlayer.getName() + "\'s turn", 
+					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
+			if(exit)
 			{
-				Object[] choices = {"OK", "EXIT"};
-				exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.", "Proceed to " + turnPlayer.getName() + "\'s turn", 
-						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
-				if(exit)
+				if(GameGUI.exit(gameDisplay))
+					System.exit(0);
+			}
+		}
+		while(exit);
+			
+		do
+		{
+			if(turnPlayer.getTrappedStatus() == true)
+			{
+				boolean stillTrapped = giveTrapTurn(turnPlayer);
+				if(stillTrapped)
+					break;
+			}
+				
+			if(turnPlayer.isImpounded())
+			{
+				boolean stillImpounded = giveImpoundTurn(turnPlayer);
+				if(stillImpounded)
+					break;
+			}
+				
+			int eatingFrequency = 5, baseMetabolism = 2;
+			if((turnPlayer.getNumMoves() + 1) % eatingFrequency == 0)
+			{
+				if(turnPlayer.getCurrentFood() >= baseMetabolism)
 				{
-					if(GameGUI.exit(gameDisplay))
-						System.exit(0);
+					turnPlayer.addFoodUnits(-1 * baseMetabolism);
+					
+					//give opportunity to forage, advance, dig for buried nuts,
+				}
+				else
+				{
+					turnPlayer.setFoodUnits(0);
+					
+					if(myBoard.getGameSpaceAt(turnPlayer.getGamePosition()) instanceof ResidenceSpace)
+					{
+						JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is out of food and getting hungry. " +
+							turnPlayer.getSubjectPronoun(true) + " will spend a turn foraging.");
+						
+						forage(turnPlayer);
+						if(turnPlayer.getCurrentFood() > 0)
+							turnPlayer.incrementMoves();
+						break;
+					}
 				}
 			}
-			while(exit);
-			
-			do
+				
+			//get the roll for this player with 2 dice
+			int rollResult = rollDice(2, turnPlayer);
+				
+			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
+			clearScreen(gameDisplay);
+				
+			if(turnPlayer.getNumDoublesRolled() > 2)
 			{
-				if(turnPlayer.getTrappedStatus() == true)
-				{
-					boolean stillTrapped = giveTrapTurn(turnPlayer);
-					if(stillTrapped)
-						break;
-				}
-				
-				if(turnPlayer.isImpounded())
-				{
-					boolean stillImpounded = giveImpoundTurn(turnPlayer);
-					if(stillImpounded)
-						break;
-				}
-				
-				//if (turnPlayer.getNumMoves() + 1) % eatingFrequency == 0
-				//if(turnPlayer.getFoodUnits() >= baseMetabolism)
-				//{give opportunity to forage, advance, dig for buried nuts, } else {player must forage}
-				
-				//get the roll for this player with 2 dice
-				int rollResult = rollDice(2, turnPlayer);
-				
-				JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
-				clearScreen(gameDisplay);
-				
-				if(turnPlayer.getNumDoublesRolled() > 2)
-				{
-					turnPlayer.zeroOutDoubles();
+				turnPlayer.zeroOutDoubles();
 					
-					//send SquirrelPlayer to Animal Control
-					JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has rolled 3 consecutive doubles while navigating. " + turnPlayer.getSubjectPronoun(true) + " pestered the wrong bird-feeder and has been apprehended by Animal Control.");
-					apprehend(turnPlayer);
+				//send SquirrelPlayer to Animal Control
+				JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " has rolled 3 consecutive doubles while navigating. " + turnPlayer.getSubjectPronoun(true) + " pestered the wrong bird-feeder and has been apprehended by Animal Control.");
+				apprehend(turnPlayer);
 					
-					break;
-				}
+				break;
+			}
 				
-				executeMove(rollResult, turnPlayer);	
+			executeMove(rollResult, turnPlayer);	
 				
-				//announce where the player is on the gameboard
-				System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
+			//announce where the player is on the gameboard
+			System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
 				
-				//if the space is occupied by another player, 
-				if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
-				{
-					int prevPos = turnPlayer.getGamePosition();
+			//if the space is occupied by another player, 
+			if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
+			{
+				int prevPos = turnPlayer.getGamePosition();
 					//we give the opportunity for breeding if opposite genders
 					//You've found a potential mate! Wanna get squirrelly?
 					
@@ -180,37 +212,231 @@ public class Game
 					//					(3)8/(365*4+1) chance
 					
 					//bounce-off, as we never have 2 squirrels in the same space
-					bounceToNeighboringSpot(turnPlayer);
-					int newPos = turnPlayer.getGamePosition();
-					JOptionPane.showMessageDialog(gameDisplay, "Position " + prevPos + " was occupied, so " + turnPlayer.getName()
-							+ " bounced into position " + newPos + ".");
-				}
-				
-				
-				GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
-				if(space instanceof LiveTrap)
-				{
-					((LiveTrap) space).applyEvent(turnPlayer, gameDisplay);
-				}
-				//apply the square's actions on this player
-				//if it's a residence space, the person should be offered the chance to:
-				//(1) claim as theirs if it's not owned and they have number of food units required
-				//(2) forage
-				//(3) rest in drey (if it's yours)
-				//(4) bury food
-				
-				System.out.println("Game.giveTurn: " + turnPlayer.getName() + " " + turnPlayer.getGamePosition());
+				bounceToNeighboringSpot(turnPlayer);
+				int newPos = turnPlayer.getGamePosition();
+				JOptionPane.showMessageDialog(gameDisplay, "Position " + prevPos + " was occupied, so " + turnPlayer.getName()
+						+ " bounced into position " + newPos + ".");
 			}
-			while(turnPlayer.getNumDoublesRolled() > 0);
+				
+			GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
+			if(space instanceof EventSpace)
+				((EventSpace)space).applyEvent(turnPlayer, this);
+			else	//this is a residence space; provide residence options
+				takeResidenceActions(turnPlayer, space);
+		}
+		while(turnPlayer.getNumDoublesRolled() > 0);
+	}
+	
+	public void takeResidenceActions(SquirrelPlayer player, GameSpace space)
+	{
+		String choice = getResidenceSpaceOption(player);
+		
+		switch(choice)
+		{
+			//add an option for upgrading spaces to main drey
+			//if(player.getDreys().size() > 1 && player.getMainDrey().getNum() != player.getGamePosition())
+		
+			case RES_CLAIM:
+				ResidenceSpace r_spc = (ResidenceSpace) space;
+				r_spc.setOwner(player);
+				player.addDrey(r_spc);
+				player.addFoodUnits(-1 * r_spc.getCost());
+				JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has taken up residence at " +
+						r_spc.getCode());
+				break;
+			case RES_FORAGE:
+				forage(player);
+				break;
+			case RES_BURY:
+				bury(player);
+				break;
+			case RES_REST:
+				rest(player);
+				break;
+			default:	//case RES_RAID
+				raid(player);
+				break;
+		}
+	}
+	
+	private String getResidenceSpaceOption(SquirrelPlayer player)
+	{
+		//add "No Action" option; make RES_CLAIM and RES_BURY available dependent on whether they can be done:
+		//if you have sufficient food or any food, respectively
+		Random rand = new Random();
+		String[] options;
+		ResidenceSpace spc = (ResidenceSpace)(myBoard.getGameSpaceAt(player.getGamePosition()));
+		
+		String[] unownedCanBuy = {RES_CLAIM, RES_FORAGE, RES_BURY},
+				unownedNoBuy = {RES_FORAGE, RES_BURY},
+				domestic = {RES_FORAGE, RES_BURY, RES_REST},
+				foreign = {RES_FORAGE, RES_BURY, RES_RAID},
+				foreignPeace = {RES_FORAGE, RES_BURY};
+		int optionsIndex;
+		
+		if(spc.getOwner() == null)
+		{
+			System.out.println(spc.getCode() + " " + spc.getCost());
+			if(player.isUserPlayer() && player.getCurrentFood() < spc.getCost())
+				options = unownedNoBuy;
+			else
+				options = unownedCanBuy;
+			
+			//simplistic decision-making for NPCs:
+			//75% chance to claim the spot if you have price to buy/25% to forage
+			//if you don't, have the price, then 90% chance to forage/10% to bury
+			if(player.getCurrentFood() >= spc.getCost())
+				optionsIndex = (rand.nextDouble() < 0.75) ? 0 : 1;
+			else
+				optionsIndex = (rand.nextDouble() < 0.9) ? 1 : 2;
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " is no longer with us. RIP.");
+			if(spc.getOwner().getPlayerID() == player.getPlayerID())
+			{
+				options = domestic;
+				
+				//all determinations are deterministic if you're in your own space
+				if(player.getCurrentHealth() < player.getMyMaxHealth())
+					optionsIndex = 2;
+				else
+				{
+					if(player.getCurrentFood() < player.getMaxFoodCapacity())
+						optionsIndex = 0;
+					else
+						optionsIndex = 1;
+				}
+			}
+			else
+			{
+				if(!(player.isUserPlayer()))
+					options = foreign;
+				else
+				{
+					//if you have more than half food-max and over 3/4 health max, you can raid
+					if(player.getCurrentFood() > player.getMaxFoodCapacity()/2 && 
+							player.getCurrentHealth() > (3 * player.getMyMaxHealth() / 4))
+						options = foreign;
+					else
+						options = foreignPeace;
+				}
+				
+				if(rand.nextDouble() < 0.9)
+					optionsIndex = 0;
+				else
+					optionsIndex = 2;
+			}	
+		}
+
+		if(player.isUserPlayer())
+		{
+			do
+			{
+				optionsIndex = JOptionPane.showOptionDialog(gameDisplay, "Please choose an option at this space: ", "Welcome to " + 
+					spc.getCode(), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+			}
+			while(optionsIndex < 0 || optionsIndex >= options.length);
 		}
 		
+		System.out.println(player.getName() + " optionsIndex: " + optionsIndex + " " + options[optionsIndex]);
 		
-		//COMMENT FOR DEBUGGING:
-		//System.out.println("end of turn");
+		return options[optionsIndex];
+	}
+	
+	private void rest(SquirrelPlayer player)
+	{
+		//make sure this is this player's drey
+		if(player.inDrey())	//or player is pregnant/nursing and in partner drey
+		{
+			int healthBoost = 2;
+			
+			//if you're in the home drey, add another point to healthBoost
+			if(player.getDreys().get(0).getSpaceNum() == player.getGamePosition())
+				healthBoost++;
+			
+			player.setCurrentHealth(player.getCurrentHealth() + healthBoost, this);
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has rested in " +
+					player.getPossessivePronoun() + " drey and regained " + healthBoost + " health points.");
+		}
+	}
+	
+	private void raid(SquirrelPlayer player)
+	{
+		ResidenceSpace resSpc = (ResidenceSpace)(myBoard.getGameSpaceAt(player.getGamePosition()));
+		
+		if(resSpc.getOwner() != null)
+		{
+			SquirrelPlayer prevOwner = resSpc.getOwner();
+			prevOwner.loseDrey(resSpc);
+			resSpc.setOwner(player);
+			player.addDrey(resSpc);
+			player.addFoodUnits(-1 * (player.getCurrentFood() + 1)/2);
+			
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has raided " +
+					prevOwner.getName() + "\'s drey and taken it over.");
+		}
+	}
+	
+	private void bury(SquirrelPlayer player)
+	{
+		if(player.getCurrentFood() > 0)
+		{
+			GameSpace spc = myBoard.getGameSpaceAt(player.getGamePosition());
+			if(spc instanceof ResidenceSpace)
+			{
+				player.addFoodUnits(-1);
+				((ResidenceSpace) spc).hideFood(player, 1);
+				
+				JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has buried food at " +
+						spc.getCode());
+			}
+		}
+	}
+	
+	private void forage(SquirrelPlayer player)
+	{
+		System.out.println("Forage");
+		GameSpace current = myBoard.getGameSpaceAt(player.getGamePosition());
+		if(!(current instanceof EventSpace))	//if this is a residence space:
+		{
+			System.out.println("Forage-if");
+			Random rand = new Random();
+			
+			//see who owns it
+			ResidenceSpace livingSpot = (ResidenceSpace) current;
+			
+			int foragingFinds;
+			
+			//if the space is unowned
+			if(livingSpot.getOwner() == null)
+			{
+				foragingFinds = rand.nextInt(2);
+			}
+			else
+			{
+				//if the space belongs to player
+				if(livingSpot.getOwner().getPlayerID() == player.getPlayerID())
+				{
+					foragingFinds = rand.nextInt(livingSpot.getCost());
+					
+					//add a unit of hidden food to the amount foraged
+					if(livingSpot.getNumHiddenFoodUnits() > 0)
+					{
+						livingSpot.hideFood(player, -1);
+					}
+				}
+				else	//it's someone else's space
+				{
+					foragingFinds = rand.nextInt(2);
+				}
+			}
+			
+			player.addFoodUnits(foragingFinds);
+			livingSpot.incrementForagingVisits();
+			String descriptor = (foragingFinds > 0) ? " a successful " : " an unsuccessful ";
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " had" + descriptor +
+					"foraging expedition:\n+" + foragingFinds + " food units");
+		}
 	}
 	
 	private void bounceToNeighboringSpot(SquirrelPlayer player)
@@ -289,6 +515,7 @@ public class Game
 		}
 		else
 		{
+			Random rand = new Random();
 			boolean escape;
 			
 			if(player.isUserPlayer())
@@ -305,7 +532,6 @@ public class Game
 			{
 				if(player.getCurrentFood() > 1)
 				{
-					Random rand = new Random();
 					escape = rand.nextBoolean();
 				}
 				else
@@ -325,6 +551,9 @@ public class Game
 				}
 				else	//unsuccessful escape
 				{
+					int illness = rand.nextInt(3);
+					JOptionPane.showMessageDialog(gameDisplay, player.getName() + " lost " + illness + " health point(s) during " + player.getPossessivePronoun() + " recent turn in Animal Control.");
+					player.setCurrentHealth(player.getCurrentHealth() - illness, this);
 					player.incrementImpoundTurns();
 					return true;
 				}
@@ -344,10 +573,10 @@ public class Game
 				else
 				{
 					int injurySum = rollDie() + rollDie();
-					player.setCurrentHealth(player.getCurrentHealth() - injurySum);
 					JOptionPane.showMessageDialog(gameDisplay, "Unfortunately, the Squirrel Mafia was unimpressed with the food offering " + 
 							player.getName() + " made. They took all of " + player.getPossessivePronoun() + " food and beat " +
 							player.getObjectPronoun() + " for " + injurySum + " health points.");
+					player.setCurrentHealth(player.getCurrentHealth() - injurySum, this);
 					player.incrementImpoundTurns();
 					return true;
 				}
@@ -398,7 +627,7 @@ public class Game
 		
 		if(restoreHealth)
 		{
-			player.setCurrentHealth(player.getMyMaxHealth());
+			player.setCurrentHealth(player.getCurrentHealth() + 5, this);
 			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has passed PROCEED and has decided to " +
 					"restore " + player.getPossessivePronoun() + " health.");
 		}
@@ -408,11 +637,9 @@ public class Game
 			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has passed PROCEED and has decided to " +
 					"restock " + player.getPossessivePronoun() + " carried food stores.");
 		}
-		//passProceed method works in 2 parts: (1) allow user to regain health OR find __ food units; 
-		// (2) increment number of go-passes for the player (and if appropriate, change to sexually mature)
 	}
 	
-	private void apprehend(SquirrelPlayer player)
+	public void apprehend(SquirrelPlayer player)
 	{		
 		//if animal control space is open, move player to this space
 		if(spaceClearFor(myBoard.getAnimalControlSpaceNum(), player))
@@ -434,9 +661,7 @@ public class Game
 			else
 			{
 				JOptionPane.showMessageDialog(gameDisplay, "There was no space at Animal Control facilities. " + player.getName() + " has been put down by Animal Control.");
-				player.setCurrentHealth(0);
-				player.setGamePosition(-1);
-				gameDisplay.updateMyPosition(player);
+				player.setCurrentHealth(0, this);
 			}
 		}
 	}
@@ -545,10 +770,4 @@ public class Game
 	{
 		activeGUI.repaint();
 	}
-
-	/*private static boolean exit()
-	{
-		return JOptionPane.showConfirmDialog(null, "Are you sure that you want to quit?",
-			"EXIT?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-	}*/
 }
