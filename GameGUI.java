@@ -22,6 +22,7 @@ public class GameGUI extends JFrame implements KeyListener
 	
 	private final int BOARD_SPACE_DIM, NUM_SPACES;
 	private boolean inPlay;
+	private int activeTurnPlayerID;
 	private int[] positions = {0,0,0,0};
 	private String[] playerNames;
 	private Color[] gameColors = new Color[4];
@@ -30,6 +31,7 @@ public class GameGUI extends JFrame implements KeyListener
 	{
 		super(GAME_NAME);
 		playerNames = names;
+		activeTurnPlayerID = 0;
 		ArrayList<Color> allColors = new ArrayList<Color>();
 		for(Color c : COLORS)
 		{
@@ -107,6 +109,11 @@ public class GameGUI extends JFrame implements KeyListener
 		return NUM_SPACES;
 	}
 	
+	public void setActiveTurnPlayer(int playerID)
+	{
+		activeTurnPlayerID = playerID;
+	}
+	
 	private void freshStart(Graphics phics)
 	{
 		phics.setColor(DEFAULT_BACKGROUND_COLOR);
@@ -140,16 +147,24 @@ public class GameGUI extends JFrame implements KeyListener
 	}
 	
 	private void drawFigures(Graphics phics)
-	{	
-		for(int playerID = 0; playerID < 4; playerID++)
+	{
+		boolean zeroSpotDrawn = false;
+		
+		for(int offset = 0; offset < 4; offset++)
 		{
-			if(positions[playerID] >= 0)
+			int playerID = (activeTurnPlayerID + offset) % 4;
+			if(positions[playerID] >  0 || (!zeroSpotDrawn && positions[playerID] == 0))
 			{
+				if(positions[playerID] == 0)
+					zeroSpotDrawn = true;
+				
 				//upper-left corner pixel coordinates
 				int[] ulc = spaceToCoordPair(positions[playerID]);
 				
 				phics.setColor(gameColors[playerID]);
 				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+				phics.setColor(Color.BLACK);
+				phics.drawString(Character.toString(playerNames[playerID].charAt(0)), HORIZ_BORDER + ulc[0] + 1 + (BOARD_SPACE_DIM/4), VERT_BORDER + ulc[1] + 1 + (3*BOARD_SPACE_DIM/4));
 			}
 		}
 	}

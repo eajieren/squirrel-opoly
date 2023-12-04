@@ -40,6 +40,7 @@ public class Game
 		gameDisplay.setVisible(true);
 		
 		int currentPlayerID = getFirstPlayerID();
+		gameDisplay.setActiveTurnPlayer(currentPlayerID);
 		
 		while(!gameOver())
 		{
@@ -52,18 +53,19 @@ public class Game
 		}
 		
 		if(gameOver())
-		{
-			gameDisplay.setGameInPlay(false);
-			/*for(SquirrelPlayer sp : players)
-			* {
-			* 	if(sp.isAlive())
-			* 	{
-			* 		//add 15-20 points
-			* 	}
-			* }
-			*/
+		{	
+			int[] points = calculatePoints();
 			
-			//int[] points = calculatePoints();
+			String results = "";
+			for(int i = 0; i < players.size(); i++)
+			{
+				results += players.get(i).getName();
+				results += ": ";
+				results += points[i];
+				results += " points\n";
+			}
+			
+			JOptionPane.showMessageDialog(gameDisplay, results);
 		}
 		
 	}
@@ -157,11 +159,7 @@ public class Game
 			if((turnPlayer.getNumMoves() + 1) % eatingFrequency == 0)
 			{
 				if(turnPlayer.getCurrentFood() >= baseMetabolism)
-				{
 					turnPlayer.addFoodUnits(-1 * baseMetabolism);
-					
-					//give opportunity to forage, advance, dig for buried nuts,
-				}
 				else
 				{
 					turnPlayer.setFoodUnits(0);
@@ -174,6 +172,7 @@ public class Game
 						forage(turnPlayer);
 						if(turnPlayer.getCurrentFood() > 0)
 							turnPlayer.incrementMoves();
+						
 						break;
 					}
 				}
@@ -417,7 +416,15 @@ public class Game
 				//if the space belongs to player
 				if(livingSpot.getOwner().getPlayerID() == player.getPlayerID())
 				{
-					foragingFinds = rand.nextInt(livingSpot.getCost());
+					if(livingSpot.getCost() > 1)
+						foragingFinds = rand.nextInt(livingSpot.getCost());
+					else
+					{
+						if(rand.nextDouble() < 0.5)
+							foragingFinds = rand.nextInt(2);
+						else
+							foragingFinds = 0;
+					}
 					
 					//add a unit of hidden food to the amount foraged
 					if(livingSpot.getNumHiddenFoodUnits() > 0)
@@ -664,6 +671,31 @@ public class Game
 				player.setCurrentHealth(0, this);
 			}
 		}
+	}
+	
+	private int[] calculatePoints()
+	{
+		int[] scores = new int[players.size()];
+		
+		for(int i = 0; i < players.size(); i++)
+		{
+			SquirrelPlayer player_i = players.get(i);
+			scores[i] = 0;
+			
+			scores[i] += (player_i.getNumLapsCompleted() * 5);
+			scores[i] += (player_i.getDreys().size());
+			
+			if(player_i.isAlive())
+				scores[i] += 10;
+		}
+		//num laps completed * 5
+		//num dreys * 1
+		//num children * 5 (if male)
+		//num children * 10 (if female)
+		
+		//if you're the last one alive, +10-15 points
+		
+		return scores;
 	}
 	
 	/*

@@ -291,7 +291,7 @@ public class SquirrelPlayer
 			//all properties owned by this player are set back to owner=null
 			
 			JOptionPane.showMessageDialog(null, myName + " has lost all health points and is now dead.");
-			setGamePosition(-1);
+			setGamePosition(-100);
 			currentGame.getDisplay().updateMyPosition(this);
 		}
 	}
