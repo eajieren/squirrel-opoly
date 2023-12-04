@@ -26,21 +26,25 @@ public class GameGUI extends JFrame implements KeyListener
 	private int[] positions = {0,0,0,0};
 	private String[] playerNames;
 	private Color[] gameColors = new Color[4];
+	private ArrayList[] dreyPositions;
 	
 	public GameGUI(int numSpaces, String[] names)
 	{
 		super(GAME_NAME);
 		playerNames = names;
 		activeTurnPlayerID = 0;
+		dreyPositions = new ArrayList[4];
 		ArrayList<Color> allColors = new ArrayList<Color>();
 		for(Color c : COLORS)
 		{
 			allColors.add(c);
 		}
+		
 		Random rand = new Random();
 		for(int i = 0; i < gameColors.length; i++)
 		{
 			gameColors[i] = allColors.remove(Math.abs(rand.nextInt()) % allColors.size());
+			dreyPositions[i] = new ArrayList<Integer>();
 		}
 		
 		DEFAULT_BACKGROUND_COLOR = this.getBackground();
@@ -81,6 +85,7 @@ public class GameGUI extends JFrame implements KeyListener
 		{
 			freshStart(phics);
 			drawBoard(phics);
+			drawDreys(phics);
 			drawKey(phics);
 			drawFigures(phics);
 		}
@@ -165,6 +170,34 @@ public class GameGUI extends JFrame implements KeyListener
 				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 				phics.setColor(Color.BLACK);
 				phics.drawString(Character.toString(playerNames[playerID].charAt(0)), HORIZ_BORDER + ulc[0] + 1 + (BOARD_SPACE_DIM/4), VERT_BORDER + ulc[1] + 1 + (3*BOARD_SPACE_DIM/4));
+			}
+		}
+	}
+	
+	public void addDrey(int playerID, int dreyPos)
+	{
+		dreyPositions[playerID].add(Integer.valueOf(dreyPos));
+	}
+	
+	public void removeDrey(int playerID, int dreyPos)
+	{
+		dreyPositions[playerID].remove(Integer.valueOf(dreyPos));
+	}
+	
+	private void drawDreys(Graphics phics)
+	{
+		for(int playerID = 0; playerID < positions.length; playerID++)
+		{
+			phics.setColor(gameColors[playerID]);
+			
+			//get drey list for this player
+			ArrayList<Integer> myDreys = dreyPositions[playerID];
+			for(Integer location : myDreys)
+			{
+				//upper-left corner pixel coordinates
+				int[] ulc = spaceToCoordPair(location);
+				
+				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
 			}
 		}
 	}

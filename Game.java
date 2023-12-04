@@ -238,7 +238,7 @@ public class Game
 			case RES_CLAIM:
 				ResidenceSpace r_spc = (ResidenceSpace) space;
 				r_spc.setOwner(player);
-				player.addDrey(r_spc);
+				player.addDrey(r_spc, gameDisplay);
 				player.addFoodUnits(-1 * r_spc.getCost());
 				JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has taken up residence at " +
 						r_spc.getCode());
@@ -366,9 +366,9 @@ public class Game
 		if(resSpc.getOwner() != null)
 		{
 			SquirrelPlayer prevOwner = resSpc.getOwner();
-			prevOwner.loseDrey(resSpc);
+			prevOwner.loseDrey(resSpc, gameDisplay);
 			resSpc.setOwner(player);
-			player.addDrey(resSpc);
+			player.addDrey(resSpc, gameDisplay);
 			player.addFoodUnits(-1 * (player.getCurrentFood() + 1)/2);
 			
 			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has raided " +

@@ -195,18 +195,20 @@ public class SquirrelPlayer
 		return myDreys;
 	}
 	
-	public void addDrey(ResidenceSpace drey)
+	public void addDrey(ResidenceSpace drey, GameGUI gui)
 	{
 		myDreys.add(drey);
+		gui.addDrey(myPlayerID, drey.getSpaceNum());
 	}
 	
-	public void loseDrey(ResidenceSpace drey)
+	public void loseDrey(ResidenceSpace drey, GameGUI gui)
 	{
 		for(int i = 0; i < myDreys.size(); i++)
 		{
 			if(myDreys.get(i).getSpaceNum() == drey.getSpaceNum())
 			{
 				myDreys.remove(i);
+				gui.removeDrey(myPlayerID, drey.getSpaceNum());
 				break;
 			}
 		}
