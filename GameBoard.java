@@ -5,9 +5,11 @@ import java.util.Random;
 public class GameBoard
 {
 	private final int NUM_SPACES, DEFAULT_SMALL = 40, DEFAULT_LARGE = 80;
-	private final String[] cornerCodes = {"PROC", "ACOV", "ANCO"},
+	private final String[] cornerCodes = {"PROCEED", "Animal Control Overflow", "Animal Control"},
 			parkCodes = {"Brownstone Community Park", "Green Pastures Park", "Clovehitch Community Park",
-					"Rosedale Lake Park"};
+					"Rosedale Lake Park"},
+			cornerSpcQuips = {"Onward on your journey!", "Be glad that you're just passing through.",
+					"Close your eyes if you're squeamish."};
 	private final String[] colors = {"Black", "Blue", "Brown", "Green", "Orange", "Red", "White", "Yellow"};
 	private final String[] geogFeatures = {"Mountain", "Lake", "River", "Tributary", "Isthmus", "Cape",
 			"Butte", "Foothills", "Volcano", "Geyser", "Fjord", "Plateau", "Oasis", "Mesa", "Valley",
@@ -101,7 +103,8 @@ public class GameBoard
 			{
 				if(spc/(NUM_SPACES/4) < 3)
 				{
-					spaces[spc] = new PassiveEventSpace(cornerCodes[cornerCode_index++], spc);
+					spaces[spc] = new PassiveEventSpace(cornerCodes[cornerCode_index],
+							cornerSpcQuips[cornerCode_index++], spc);
 					continue;
 				}
 				else

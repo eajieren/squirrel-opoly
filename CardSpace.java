@@ -144,7 +144,8 @@ public class CardSpace extends EventSpace
 		if(message.indexOf("Human Home") != -1)
 			message = message.replace("Human Home", currentGame.getBoard().getLocationName(currentCard.getNum()));
 		
-		JOptionPane.showMessageDialog(currentGame.getDisplay(), player.getName() + " drew a card:\n\n" + message
+		JOptionPane.showMessageDialog(currentGame.getDisplay(), player.getName() + " landed on a " +
+				getCode() + " space and drew a card:\n\n" + message
 				+ "\n" + impact);
 	}
 	

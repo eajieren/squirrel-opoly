@@ -185,23 +185,7 @@ public class Game
 			
 			int doubles_after = turnPlayer.getNumDoublesRolled();
 			
-			String doubleWarning = "";
-			if(doubles_after > doubles_before && doubles_after < 3)
-			{
-				doubleWarning += turnPlayer.getName() + " rolled a double and will thus receive an extra roll " +
-						"for this turn. ";
-				if(doubles_after == 2)
-				{
-					doubleWarning += "This is " + turnPlayer.getPossessivePronoun() + " second straight " +
-							"double rolled. ";
-				}
-				
-				doubleWarning += (turnPlayer.isUserPlayer()) ? "You" : turnPlayer.getSubjectPronoun(true);
-				
-				doubleWarning += 
-						" should proceed with caution,\nas such oddities draw attention. After rolling 3 " +
-						"straight doubles, a squirrel will be apprehended by Animal Control.";
-			}
+			String doubleWarning = getDoubleWarning(turnPlayer, doubles_before, doubles_after);
 				
 			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " +
 					formatIndefiniteArticle(rollResult) + ".");
@@ -253,6 +237,29 @@ public class Game
 				takeResidenceActions(turnPlayer, space);
 		}
 		while(turnPlayer.getNumDoublesRolled() > 0);
+	}
+	
+	public String getDoubleWarning(SquirrelPlayer turnPlayer, int doubles_before, int doubles_after)
+	{
+		String doubleWarning = "";
+		if(doubles_after > doubles_before && doubles_after < 3)
+		{
+			doubleWarning += turnPlayer.getName() + " rolled a double and will thus receive an extra roll " +
+					"for this turn. ";
+			if(doubles_after == 2)
+			{
+				doubleWarning += "This is " + turnPlayer.getPossessivePronoun() + " second straight " +
+						"double rolled. ";
+			}
+			
+			doubleWarning += (turnPlayer.isUserPlayer()) ? "You" : turnPlayer.getSubjectPronoun(true);
+			
+			doubleWarning += 
+					" should proceed with caution,\nas such oddities draw attention. After rolling 3 " +
+					"straight doubles, a squirrel will be apprehended by Animal Control.";
+		}
+		
+		return doubleWarning;
 	}
 	
 	public void takeResidenceActions(SquirrelPlayer player, GameSpace space)
