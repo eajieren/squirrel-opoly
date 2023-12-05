@@ -177,11 +177,40 @@ public class Game
 					}
 				}
 			}
-				
+			
+			int doubles_before = turnPlayer.getNumDoublesRolled();
+			
 			//get the roll for this player with 2 dice
 			int rollResult = rollDice(2, turnPlayer);
+			
+			int doubles_after = turnPlayer.getNumDoublesRolled();
+			
+			String doubleWarning = "";
+			if(doubles_after > doubles_before && doubles_after < 3)
+			{
+				doubleWarning += turnPlayer.getName() + " rolled a double and will thus receive an extra roll " +
+						"for this turn. ";
+				if(doubles_after == 2)
+				{
+					doubleWarning += "This is " + turnPlayer.getPossessivePronoun() + " second straight " +
+							"double rolled. ";
+				}
 				
-			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " + formatIndefiniteArticle(rollResult) + ".");
+				doubleWarning += (turnPlayer.isUserPlayer()) ? "You" : turnPlayer.getSubjectPronoun(true);
+				
+				doubleWarning += 
+						" should proceed with caution,\nas such oddities draw attention. After rolling 3 " +
+						"straight doubles, a squirrel will be apprehended by Animal Control.";
+			}
+				
+			JOptionPane.showMessageDialog(gameDisplay, turnPlayer.getName() + " rolls " +
+					formatIndefiniteArticle(rollResult) + ".");
+			if(!(doubleWarning.equals("")))
+			{
+				JOptionPane.showMessageDialog(gameDisplay, doubleWarning, "WARNING!",
+						JOptionPane.WARNING_MESSAGE);
+			}
+			
 			clearScreen(gameDisplay);
 				
 			if(turnPlayer.getNumDoublesRolled() > 2)
