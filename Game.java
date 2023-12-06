@@ -24,7 +24,7 @@ public class Game
 	private GameBoard myBoard;
 	private GameGUI gameDisplay;
 	private ArrayList<SquirrelPlayer> players;
-	
+	private String claimStr, raidStr;
 	
 	public Game(GameBoard board, ArrayList<SquirrelPlayer> gamePlayers, GameGUI display)
 	{
@@ -129,7 +129,8 @@ public class Game
 		do
 		{
 			Object[] choices = {"OK", "EXIT"};
-			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn.\nFOOD: " + turnPlayer.getCurrentFood() + "/" + turnPlayer.getMaxFoodCapacity() + "\nHEALTH: " + turnPlayer.getCurrentHealth() + "/" + turnPlayer.getMyMaxHealth(), "Proceed to " + turnPlayer.getName() + "\'s turn", 
+			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn." +
+					getFoodHealthStatus(turnPlayer), "Proceed to " + turnPlayer.getName() + "\'s turn",
 					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
 			if(exit)
 			{
@@ -216,14 +217,15 @@ public class Game
 			//if the space is occupied by another player, 
 			if(!spaceClearFor(turnPlayer.getGamePosition(), turnPlayer))
 			{
-				int prevPos = turnPlayer.getGamePosition();
 					//we give the opportunity for breeding if opposite genders
 					//You've found a potential mate! Wanna get squirrelly?
 					
 					//In order to breed: (1) genders must be opposite (2) both players must have passed Proceed once
 					//					(3)8/(365*4+1) chance
 					
-					//bounce-off, as we never have 2 squirrels in the same space
+				int prevPos = turnPlayer.getGamePosition();
+				
+				//bounce-off, as we never have 2 squirrels in the same space
 				bounceToNeighboringSpot(turnPlayer);
 				int newPos = turnPlayer.getGamePosition();
 				JOptionPane.showMessageDialog(gameDisplay, "Position " + prevPos + " was occupied, so " + turnPlayer.getName()
@@ -265,6 +267,9 @@ public class Game
 	public void takeResidenceActions(SquirrelPlayer player, GameSpace space)
 	{
 		String choice = getResidenceSpaceOption(player);
+		int additionalInfoIndex = choice.indexOf(" (");
+		if(additionalInfoIndex != -1)
+			choice = choice.substring(0, additionalInfoIndex);
 		
 		switch(choice)
 		{
@@ -294,6 +299,12 @@ public class Game
 		}
 	}
 	
+	private String getFoodHealthStatus(SquirrelPlayer player)
+	{
+		return "\nFOOD: " + player.getCurrentFood() + "/" + player.getMaxFoodCapacity() +
+		"\nHEALTH: " + player.getCurrentHealth() + "/" + player.getMyMaxHealth();
+	}
+	
 	private String getResidenceSpaceOption(SquirrelPlayer player)
 	{
 		//add "No Action" option; make RES_CLAIM and RES_BURY available dependent on whether they can be done:
@@ -315,8 +326,10 @@ public class Game
 			if(player.isUserPlayer() && player.getCurrentFood() < spc.getCost())
 				options = unownedNoBuy;
 			else
+			{
 				options = unownedCanBuy;
-			
+				options[0] = RES_CLAIM + " (Cost: " + spc.getCost() + " food)";
+			}
 			//simplistic decision-making for NPCs:
 			//75% chance to claim the spot if you have price to buy/25% to forage
 			//if you don't, have the price, then 90% chance to forage/10% to bury
@@ -330,6 +343,8 @@ public class Game
 			if(spc.getOwner().getPlayerID() == player.getPlayerID())
 			{
 				options = domestic;
+				int boost = (player.getDreys().get(0).getSpaceNum() == player.getGamePosition()) ? 3 : 2;
+				options[2] = RES_REST + " (+" + boost + " health points)";
 				
 				//all determinations are deterministic if you're in your own space
 				if(player.getCurrentHealth() < player.getMyMaxHealth())
@@ -351,15 +366,19 @@ public class Game
 					//if you have more than half food-max and over 3/4 health max, you can raid
 					if(player.getCurrentFood() > player.getMaxFoodCapacity()/2 && 
 							player.getCurrentHealth() > (3 * player.getMyMaxHealth() / 4))
+					{
 						options = foreign;
+						options[2] = RES_RAID + " (Cost: " + (player.getCurrentFood() + 1)/2 + " food)";
+					}
 					else
 						options = foreignPeace;
 				}
 				
-				if(rand.nextDouble() < 0.9)
-					optionsIndex = 0;
-				else
+				if((rand.nextDouble() < 0.2) && (player.getCurrentFood() > player.getMaxFoodCapacity()/2) && 
+						(player.getCurrentHealth() > (3 * player.getMyMaxHealth() / 4)))
 					optionsIndex = 2;
+				else
+					optionsIndex = 0;
 			}	
 		}
 
@@ -367,8 +386,19 @@ public class Game
 		{
 			do
 			{
-				optionsIndex = JOptionPane.showOptionDialog(gameDisplay, "Please choose an option at this space: ", "Welcome to " + 
-					spc.getCode(), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+				String welcomeStr = "";
+				if(player.inDrey())
+					welcomeStr = "your drey at ";
+				else
+				{
+					if(spc.getOwner() != null)
+						welcomeStr = spc.getOwner().getName() + "\'s drey at ";
+				}
+				
+				optionsIndex = JOptionPane.showOptionDialog(gameDisplay, player.getName() + ", welcome to " +
+					welcomeStr + spc.getCode() + "! Please choose an option at this space: ", "Welcome to " + 
+					spc.getCode(), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+					options, options[0]);
 			}
 			while(optionsIndex < 0 || optionsIndex >= options.length);
 		}
@@ -482,6 +512,55 @@ public class Game
 		}
 	}
 	
+	public int getNearbyOpenUnownedSpaceNum(int currentPos)
+	{
+		int offset = 1;
+		do
+		{
+			int vacantPlus = (currentPos + offset) % myBoard.getNumSpaces(),
+					vacantMinus = (currentPos - offset + myBoard.getNumSpaces()) % myBoard.getNumSpaces();
+			
+			if(isEmpty(vacantPlus) && myBoard.getGameSpaceAt(vacantPlus) instanceof ResidenceSpace &&
+					((ResidenceSpace)(myBoard.getGameSpaceAt(vacantPlus))).getOwner() == null)
+				return vacantPlus;
+			
+			if(isEmpty(vacantMinus) && myBoard.getGameSpaceAt(vacantMinus) instanceof ResidenceSpace &&
+					((ResidenceSpace)(myBoard.getGameSpaceAt(vacantMinus))).getOwner() == null)
+				return vacantMinus;
+			
+			offset++;
+		}
+		while(offset < myBoard.getNumSpaces()/2);
+		
+		return -19;
+	}
+	
+	public int getNearbyOpenResSpaceNum(int currentPos)
+	{
+		int offset = 1;
+		do
+		{
+			int vacantPlus = (currentPos + offset) % myBoard.getNumSpaces(),
+					vacantMinus = (currentPos - offset + myBoard.getNumSpaces()) % myBoard.getNumSpaces();
+			
+			if(isEmpty(vacantPlus) && myBoard.getGameSpaceAt(vacantPlus) instanceof ResidenceSpace)
+				return vacantPlus;
+			
+			if(isEmpty(vacantMinus) && myBoard.getGameSpaceAt(vacantMinus) instanceof ResidenceSpace)
+				return vacantMinus;
+			
+			offset++;
+		}
+		while(offset < myBoard.getNumSpaces()/2);
+		
+		return currentPos;
+	}
+	
+	private boolean isEmpty(int location)
+	{
+		return gameDisplay.isEmptyAt(location);
+	}
+	
 	private void bounceToNeighboringSpot(SquirrelPlayer player)
 	{
 		Random rand = new Random();
@@ -550,10 +629,19 @@ public class Game
 		if(player.getImpoundTurns() >= IMPOUND_ESCAPE_LIMIT)
 		{
 			player.setImpoundStatus(false);
-			player.setFoodUnits(0);
+			String foodImpact = "";
+			if(player.getCurrentFood() > 0)
+			{
+				foodImpact += player.getSubjectPronoun(true) + " jettisoned " + player.getPossessivePronoun() +
+						" " + player.getCurrentFood() + " unit";
+				foodImpact += (player.getCurrentFood() == 1) ? " " : "s ";
+				foodImpact += "of food in order to facilitate " + player.getPossessivePronoun() + " escape.";
+				player.setFoodUnits(0);
+			}
+			
 			JOptionPane.showMessageDialog(gameDisplay, player.getName() + 
-					" has been freed by the Free Nibblers movement. All of" +
-					" your on-hand food was jettisoned in your escape.");
+					" has been freed from Animal Control by the mercy of the Free Nibblers movement. " +
+					foodImpact);
 			return false;
 		}
 		else
@@ -567,9 +655,10 @@ public class Game
 						"Please select how you will proceed.";
 				
 				//allow player to decide to escape or wait
-				Object[] choices = {"Attempt to escape", "Exchange all food for freedom"};
-				escape = JOptionPane.showOptionDialog(gameDisplay, premise, player.getName() + " in Animal Control custody!", 
-						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
+				Object[] choices = {"Attempt to escape", "Exchange all food (" + player.getCurrentFood() + " food unit(s)) for freedom"};
+				escape = JOptionPane.showOptionDialog(gameDisplay, premise, player.getName() +
+						" in Animal Control custody!", JOptionPane.YES_NO_OPTION,
+						JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
 			}
 			else
 			{
@@ -590,12 +679,16 @@ public class Game
 				{
 					player.zeroOutDoubles();
 					player.setImpoundStatus(false);
+					JOptionPane.showMessageDialog(gameDisplay, player.getName() + " tried and escaped from " +
+							"Animal Control custody!");
 					return false;
 				}
 				else	//unsuccessful escape
 				{
-					int illness = rand.nextInt(3);
-					JOptionPane.showMessageDialog(gameDisplay, player.getName() + " lost " + illness + " health point(s) during " + player.getPossessivePronoun() + " recent turn in Animal Control.");
+					int illness = rand.nextInt(2) + 1;
+					JOptionPane.showMessageDialog(gameDisplay, player.getName() + " tried to escape from " +
+					"Animal Control custody but was unsuccessful and lost " + illness + " health point(s) " +
+					"during " + player.getPossessivePronoun() + " recent turn in Animal Control.");
 					player.setCurrentHealth(player.getCurrentHealth() - illness, this);
 					player.incrementImpoundTurns();
 					return true;
@@ -635,9 +728,14 @@ public class Game
 		
 		if(player.isUserPlayer())
 		{
-			Object[] choices = {"Restore health", "Load up on food"};
-			restoreHealth = JOptionPane.showOptionDialog(gameDisplay, player.getName() + " passed the PROCEED space. Choose one of the following benefits to aid you on your journey:", player.getName() + " passed PROCEED!", 
-					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
+			int healthRestore = Math.min(5, player.getMyMaxHealth() - player.getCurrentHealth());
+			String plural = (healthRestore == 1) ? "" : "s";
+			Object[] choices = {"Restore health (+" + healthRestore + " health point" + plural + ")", "Fill up on food"};
+			restoreHealth = JOptionPane.showOptionDialog(gameDisplay, player.getName() +
+					" passed the PROCEED space with the following status measures:" +
+					getFoodHealthStatus(player) + "\nChoose one of the following benefits to aid you " +
+					"on your journey:", player.getName() + " passed PROCEED!", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 0;
 		}
 		else
 		{

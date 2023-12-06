@@ -39,8 +39,8 @@ AT/ate a beetle/1
 4LE/Go to Space 21/21
 4LE/Go to Space 41/41
 4LE/Go to Space 61/61
-4LE/Go to nearby unoccupied & unowned residence space/0
-4LE/Go to nearby unoccupied & unowned residence space/0
+4LE/Go to nearby unowned or unoccupied residence space/0
+4LE/Go to nearby unowned or unoccupied residence space/0
 DoD/Fleas infect your drey/-5
 DoD/Snake bite/-5
 DoD/Cared for by a conservatory/+8

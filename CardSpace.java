@@ -60,50 +60,58 @@ public class CardSpace extends EventSpace
 					break;
 				}
 				
-				if(cardDrawn.getMessage().equals("Go to nearby unoccupied & unowned residence space"))
+				int destination;
+				if(cardDrawn.getMessage().equals("Go to nearby unowned or unoccupied residence space"))
 				{
-					//Syste.out.;
-					break;
-				}
-				
-				//check if this card isNumRelative; if it is, calculate the moveTo space based on the player's current position
-				int destination = cardDrawn.getNum();
-				if(cardDrawn.isNumRelative())
-					destination += player.getGamePosition();
-				
-				//once the moveTo space is calculated, figure out if it's open; if it's not, find 
-				if(!(display.isEmptyAt(destination)))
-				{
-					//try to find the nearest empty space BEHIND the desired destination spot
-					//as long as you don't cross PROCEED while going backward
-					int alternate = destination - 1;
-					while(alternate >= 0)
-					{
-						if(display.isEmptyAt(alternate))
-							break;
-						else
-							alternate--;
-					}
+					destination = currentGame.getNearbyOpenUnownedSpaceNum(player.getGamePosition());
 					
-					//if you don't find an empty space before crossing proceed, increment forward
-					//from destination to find an empty space
-					if(alternate < 0)
+					//if there's no open and un-owned space, send the player to the nearest unoccupied space
+					if(destination == -19)
+						destination = currentGame.getNearbyOpenResSpaceNum(player.getGamePosition());
+				}
+				else
+				{
+					//check if this card isNumRelative; if it is, calculate the moveTo space based on the player's current position
+					destination = cardDrawn.getNum();
+					if(cardDrawn.isNumRelative())
+						destination += player.getGamePosition();
+					
+					//once the moveTo space is calculated, figure out if it's open; if it's not, find 
+					if(!(display.isEmptyAt(destination)))
 					{
-						alternate = destination + 1;
-						while(!(display.isEmptyAt(alternate % display.getNumSpaces())))
+						//try to find the nearest empty space BEHIND the desired destination spot
+						//as long as you don't cross PROCEED while going backward
+						int alternate = destination - 1;
+						while(alternate >= 0)
 						{
-							alternate++;
+							if(display.isEmptyAt(alternate))
+								break;
+							else
+								alternate--;
 						}
+						
+						//if you don't find an empty space before crossing proceed, increment forward
+						//from destination to find an empty space
+						if(alternate < 0)
+						{
+							alternate = destination + 1;
+							while(!(display.isEmptyAt(alternate % display.getNumSpaces())))
+							{
+								alternate++;
+							}
+						}
+						
+						JOptionPane.showMessageDialog(display, "Space " + destination + " was occupied, so " +
+								player.getName() + " was sent to space " + alternate + " instead.");
+						
+						destination = alternate;
 					}
-					
-					JOptionPane.showMessageDialog(display, "Space " + destination + " was occupied, so " +
-							player.getName() + " was sent to space " + alternate + " instead.");
-					
-					destination = alternate;
 				}
+				
 					
 				//move the player to this position
 				player.moveTo(destination, display);
+				
 				if(currentGame.getBoard().getGameSpaceAt(destination) instanceof ResidenceSpace)
 					currentGame.takeResidenceActions(player, currentGame.getBoard().getGameSpaceAt(destination));
 				break;
