@@ -122,9 +122,10 @@ public class Game
 		return highID;
 	}
 	
+	//pre-condition: turnPlayer is a live player (health points > 0)
 	private void giveTurn(SquirrelPlayer turnPlayer)
 	{
-		System.out.println(turnPlayer.getName() + " turn# " + turnPlayer.getNumMoves());
+		System.out.println("ENTER giveTurn: " + turnPlayer.getName() + " turn# " + turnPlayer.getNumMoves());
 		boolean exit;
 		do
 		{
@@ -222,14 +223,8 @@ public class Game
 					
 					//In order to breed: (1) genders must be opposite (2) both players must have passed Proceed once
 					//					(3)8/(365*4+1) chance
-					
-				int prevPos = turnPlayer.getGamePosition();
 				
-				//bounce-off, as we never have 2 squirrels in the same space
-				bounceToNeighboringSpot(turnPlayer);
-				int newPos = turnPlayer.getGamePosition();
-				JOptionPane.showMessageDialog(gameDisplay, "Position " + prevPos + " was occupied, so " + turnPlayer.getName()
-						+ " bounced into position " + newPos + ".");
+				bounce(turnPlayer);
 			}
 				
 			GameSpace space = myBoard.getGameSpaceAt(turnPlayer.getGamePosition());
@@ -238,7 +233,9 @@ public class Game
 			else	//this is a residence space; provide residence options
 				takeResidenceActions(turnPlayer, space);
 		}
-		while(turnPlayer.getNumDoublesRolled() > 0);
+		while(turnPlayer.getNumDoublesRolled() > 0 && turnPlayer.isAlive());
+		
+		System.out.println("EXIT giveTurn: " + turnPlayer.getName());
 	}
 	
 	public String getDoubleWarning(SquirrelPlayer turnPlayer, int doubles_before, int doubles_after)
@@ -561,6 +558,27 @@ public class Game
 		return gameDisplay.isEmptyAt(location);
 	}
 	
+	private void bounce(SquirrelPlayer turnPlayer)
+	{
+		int prevPos = turnPlayer.getGamePosition();
+		String prevLocName = myBoard.getLocationName(turnPlayer.getGamePosition());
+		
+		//bounce-off, as we never have 2 squirrels in the same space
+		bounceToNeighboringSpot(turnPlayer);
+		int newPos = turnPlayer.getGamePosition();
+		String newLocName = myBoard.getLocationName(turnPlayer.getGamePosition());
+		String direction;
+		if((newPos - prevPos) > -4 && (newPos - prevPos) < 0)
+			direction = "backward";
+		else
+			direction = "forward";
+		String plural = (Math.abs(newPos - prevPos) == 1) ? " " : "s ";
+		
+		JOptionPane.showMessageDialog(gameDisplay, prevLocName + " was occupied, so " + 
+				turnPlayer.getName() + " bounced " + direction + " " + Math.abs(newPos - prevPos) +
+				" space" + plural + "to " + newLocName + ".");
+	}
+	
 	private void bounceToNeighboringSpot(SquirrelPlayer player)
 	{
 		Random rand = new Random();
@@ -598,6 +616,7 @@ public class Game
 		
 		player.incrementMoves();
 		
+		//if the player completed a lap around the board, do the operations for the pass
 		if(passProceed)
 		{
 			passProceed(player);
@@ -616,8 +635,11 @@ public class Game
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " is stuck in a live trap and skips turn " + player.getTrapTurns() +
-					" of " + player.getTotalTrapTurns() + ".");
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " is stuck in a live trap and " +
+					"skips turn " + player.getTrapTurns() + " of " + player.getTotalTrapTurns() + "." +
+					player.getSubjectPronoun(true) + " also loses 1 health point due to exposure and " +
+					"anxiety from being confined.");
+			player.setCurrentHealth(player.getCurrentHealth() - 1, this);
 			return true;
 		}
 	}
@@ -686,9 +708,12 @@ public class Game
 				else	//unsuccessful escape
 				{
 					int illness = rand.nextInt(2) + 1;
+					String encouragement = (illness >= player.getCurrentHealth()) ? "" :
+						" Don't give up, little squirrel!";
 					JOptionPane.showMessageDialog(gameDisplay, player.getName() + " tried to escape from " +
-					"Animal Control custody but was unsuccessful and lost " + illness + " health point(s) " +
-					"during " + player.getPossessivePronoun() + " recent turn in Animal Control.");
+					"Animal Control custody but was unsuccessful. Due to the poor conditions in the Animal " +
+					"Control facilities, " + player.getSubjectPronoun(false) + " lost " + illness + 
+					" health point(s) during this turn." + encouragement);
 					player.setCurrentHealth(player.getCurrentHealth() - illness, this);
 					player.incrementImpoundTurns();
 					return true;
