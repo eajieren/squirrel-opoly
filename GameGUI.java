@@ -6,7 +6,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -192,12 +194,20 @@ public class GameGUI extends JFrame implements KeyListener
 			
 			//get drey list for this player
 			ArrayList<Integer> myDreys = dreyPositions[playerID];
-			for(Integer location : myDreys)
+			for(int i = 0; i < myDreys.size(); i++)
 			{
+				Integer location = myDreys.get(i);
 				//upper-left corner pixel coordinates
 				int[] ulc = spaceToCoordPair(location);
 				
 				phics.fillRect(HORIZ_BORDER + ulc[0] + 1, VERT_BORDER + ulc[1] + 1, BOARD_SPACE_DIM - 2, BOARD_SPACE_DIM - 2);
+				
+				if(i == 0)
+				{
+					phics.setColor(Color.BLACK);
+					phics.drawOval(HORIZ_BORDER + ulc[0] + 3, VERT_BORDER + ulc[1] + 3 , BOARD_SPACE_DIM - 6, BOARD_SPACE_DIM - 6);
+					phics.setColor(gameColors[playerID]);
+				}
 			}
 		}
 	}
@@ -211,6 +221,11 @@ public class GameGUI extends JFrame implements KeyListener
 		phics.setFont(new Font("Times New Roman", Font.BOLD, 25));
 		phics.drawString("COLOR KEY", HORIZ_BORDER + (NUM_SPACES/4 + 1)*BOARD_SPACE_DIM + 50, 3 * VERT_BORDER);
 		
+		Font txtDefault = new Font("Arial", Font.PLAIN, 17);
+		Map attributes = txtDefault.getAttributes();
+		attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+		Font struckThrough = new Font(attributes);
+		
 		int ulcX = (NUM_SPACES/4 + 1) * BOARD_SPACE_DIM + OFFSET;
 		for(int i = 0; i < positions.length; i++)
 		{
@@ -221,7 +236,10 @@ public class GameGUI extends JFrame implements KeyListener
 			
 			//writes out the corresponding player name
 			phics.setColor(Color.DARK_GRAY);
-			phics.setFont(new Font("Arial", Font.PLAIN, 17));
+			if(positions[i] < 0)
+				phics.setFont(struckThrough);
+			else
+				phics.setFont(new Font("Arial", Font.PLAIN, 17));
 			phics.drawString(playerNames[i], HORIZ_BORDER + ulcX + 2 * BOARD_SPACE_DIM, 3 * VERT_BORDER + ulcY + BOARD_SPACE_DIM - 5);
 		}
 		

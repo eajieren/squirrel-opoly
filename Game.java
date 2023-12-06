@@ -212,7 +212,7 @@ public class Game
 				
 			executeMove(rollResult, turnPlayer);	
 				
-			//announce where the player is on the gameboard
+			//announce where the player is on the gameboard 
 			System.out.println(turnPlayer.getName() + " has arrived at " + myBoard.getLocationName(turnPlayer.getGamePosition()));
 				
 			//if the space is occupied by another player, 
@@ -398,6 +398,10 @@ public class Game
 					options, options[0]);
 			}
 			while(optionsIndex < 0 || optionsIndex >= options.length);
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(gameDisplay, player.getName() + " has arrived at " + spc.getCode());
 		}
 		
 		System.out.println(player.getName() + " optionsIndex: " + optionsIndex + " " + options[optionsIndex]);
