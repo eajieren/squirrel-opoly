@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -52,22 +53,7 @@ public class Game
 			currentPlayerID++;
 		}
 		
-		if(gameOver())
-		{	
-			int[] points = calculatePoints();
-			
-			String results = "";
-			for(int i = 0; i < players.size(); i++)
-			{
-				results += players.get(i).getName();
-				results += ": ";
-				results += points[i];
-				results += " points\n";
-			}
-			
-			JOptionPane.showMessageDialog(gameDisplay, results);
-		}
-		
+		displayFinalStats();
 	}
 	
 	public GameGUI getDisplay()
@@ -78,6 +64,22 @@ public class Game
 	public GameBoard getBoard()
 	{
 		return myBoard;
+	}
+	
+	private void displayFinalStats()
+	{
+		int[] points = calculatePoints();
+		
+		String results = "FINAL SCORES:\n";
+		for(int i = 0; i < players.size(); i++)
+		{
+			results += players.get(i).getName();
+			results += ": ";
+			results += points[i];
+			results += " points\n";
+		}
+		
+		JOptionPane.showMessageDialog(gameDisplay, results);
 	}
 	
 	private int getFirstPlayerID()
@@ -126,20 +128,25 @@ public class Game
 	private void giveTurn(SquirrelPlayer turnPlayer)
 	{
 		System.out.println("ENTER giveTurn: " + turnPlayer.getName() + " turn# " + turnPlayer.getNumMoves());
-		boolean exit;
+		int choiceIndex;
 		do
 		{
-			Object[] choices = {"OK", "EXIT"};
-			exit = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn." +
+			Object[] choices = {"OK", "REVIEW RULES", "EXIT"};
+			choiceIndex = JOptionPane.showOptionDialog(gameDisplay, "It's " + turnPlayer.getName() + "\'s turn." +
 					getFoodHealthStatus(turnPlayer), "Proceed to " + turnPlayer.getName() + "\'s turn",
-					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]) == 1;
-			if(exit)
+					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, choices[0]);
+			if(choiceIndex == 1)
+			{
+				displayRules();
+			}
+			
+			if(choiceIndex == 2)
 			{
 				if(GameGUI.exit(gameDisplay))
 					System.exit(0);
 			}
 		}
-		while(exit);
+		while(choiceIndex != 0);
 			
 		do
 		{
@@ -923,6 +930,19 @@ public class Game
 		System.out.println("Game.rollDice(): " + roller.getName() + ": " + sum);
 		
 		return sum;
+	}
+	
+	//display rules in a modal window
+	private void displayRules()
+	{
+		JPanel panel = new JPanel();
+		
+		final JDialog frame = new JDialog(gameDisplay, "Rules", true);
+		frame.setPreferredSize(new Dimension(500, 500));
+		frame.getContentPane().add(panel);
+		frame.pack();
+		frame.setLocationRelativeTo(gameDisplay);
+		frame.setVisible(true);
 	}
 	
 	private boolean gameOver()

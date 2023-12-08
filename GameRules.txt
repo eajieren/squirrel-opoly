@@ -1,0 +1,48 @@
+Squirrelopoly Rules
+
+START THE GAME:
+The game is played with 4 players. To determine who will go first, each player rolls 3 dice. The player who rolls the highest sum, or the first player to roll the highest sum (in the case of a tie), goes first.
+
+GAMEPLAY
+Each player represents a squirrel trying to live and thrive in a suburban area. Throughout the game, players keep track of 2 statistics: amount of food on-hand and the number of health points they have.
+
+Each player starts out on the PROCEED square and, on his/her turn, rolls 2 dice to determine how many spaces to move. After his/her roll, the player will advance the number of spaces equal to the sum of the 2 dice. The player can end up landing on 2 general types of spaces:
+
+1) Residence spaces (spaces representing trees or spaces representing human houses)
+
+OR
+
+2) Event spaces (card spaces, adventure spaces, live trap space)
+
+RESIDENCE SPACES:
+When a player lands on a residence space, he/she will be presented with different options depending on whether the space is (a) unowned, (b) his/her own, (c) belonging to another player.
+
+If the space is unowned, the player will have the option to: (a) obtain the property and make it one of his/her homes/dreys by putting down the cost of the property in food invested to make it ready for him/her to live in; (b) forage at the property (an attempt to acquire more food); or (c) bury on-hand food at this property (with the hope of digging it back up later.
+
+If the space is owned by the player, he/she will have the option to: (a) forage (as above) with the added bonus of unearthing a unit of food (if any) that has been already hidden/buried at this property; (b) bury/hide on-hand food; (c) rest (in order to regain health points). At any drey you own, you can rest and regain 2 health-points per turn. But if this is your home drey (the earliest acquired drey in your possession), you regain an additional health-point, for a total of 3 health-points regained per turn.
+
+If the space is owned by another player, the visiting player will have the option to: (a) forage; (b) bury/hide on-hand food; or (c) raid the opposing player's drey and claim it as his/her own. Raiding is only an option when the visiting player has at least 1/2 of his/her max food capacity and at least 3/4 of his total possible health points.
+
+EVENT SPACES:
+Trove of Acorns:
+If you land on a Trove of Acorns space, you'll draw a card from the top of the Trove of Acorns card deck. This card will relay to you an event that has occurred that will in some way impact your on-hand food, either causing you to lose or gain food units.
+
+Fleet of Paw:
+If you land on a Fleet of Paw space, you'll draw a card from the top of the Fleet of Paw card deck. This card will move your player to a different space on the board (hopefully further along instead of backward).
+
+Doc or Danger:
+If you land on a Doc or Danger space, you'll draw a card from the top of the Doc or Danger card deck. This card will relay to you an event that has occurred that will in some way impact your health points, either causing you to lose or gain them.
+
+Adventure:
+???
+
+Live Trap:
+If you land on the Live Trap space, your character is captured in a live rat trap. You then have the option to: (a) escape (roll to determine how many health points you lose from injury in your escape); or (b) wait (roll to determine how many turns you'll skip) 1-3 turns.
+
+Being apprehended by animal control:
+Any player who rolls 3 consecutive doubles (a roll result where both dice rolled land on the same number, e.g. two 3s or two 5s) is automatically sent to the Animal Control space (unless that space is occupied, in which case, the person goes to the Animal Control Overflow space). If, somehow, both of those spaces are occupied (even by a player just passing over the space and not actually in Animal Control custody), then the player automatically loses (by being culled, as Animal Control doesn't have space).
+
+When in Animal Control custody, you have 3 turns there during which you cannot leave unless you escape by rolling a double on your turn. In the case that you roll a double, you are freed and able to continue on with the game by rolling and advancing from the Animal Control space you were occupying. However, you can also opt not to roll to escape and instead opt to exchange all of your on-hand food to the Squirrel Mafia for them to sneak you out of Animal Control. If the Squirrel Mafia is satisfied with your offering, you will escape (minus your food). If they are unsatisfied, they will take your food anyway and will beat you to teach you a lesson.
+
+HOW TO WIN:
+A player is eliminated from the game when his/her player has 0 or fewer health points. Once there is one player still alive, the game is over. At this point, scores are calculated: 5 points for each completed lap around the board, 1 point for each drey owned at the end of the game, and 10 points to the last player left alive. Whoever has the most points is the winner.

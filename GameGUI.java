@@ -239,7 +239,7 @@ public class GameGUI extends JFrame implements KeyListener
 			if(positions[i] < 0)
 				phics.setFont(struckThrough);
 			else
-				phics.setFont(new Font("Arial", Font.PLAIN, 17));
+				phics.setFont(txtDefault);
 			phics.drawString(playerNames[i], HORIZ_BORDER + ulcX + 2 * BOARD_SPACE_DIM, 3 * VERT_BORDER + ulcY + BOARD_SPACE_DIM - 5);
 		}
 		
