@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
@@ -956,12 +957,9 @@ public class Game
 		textArea.setSize(new Dimension(500, 500));
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
+		textArea.setMargin(new Insets(10, 10, 10, 10));
 		JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); 
-		JScrollBar bar = scrollPane.getVerticalScrollBar();
-		bar.setPreferredSize(new Dimension(15, 0));;
-		//scrollPane.setVerticalScrollBarPolicy();
-		//panel.add(scrollPane, BorderLayout.CENTER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		final JDialog frame = new JDialog(gameDisplay, "Rules", true);
 		frame.setPreferredSize(new Dimension(500, 500));
