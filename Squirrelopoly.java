@@ -171,7 +171,7 @@ public class Squirrelopoly
 		return true;
 	}
 	
-	private static ArrayList<String> textFileToArrayList(String fileLocation)
+	public static ArrayList<String> textFileToArrayList(String fileLocation)
 	{
 		ArrayList<String> stringList = new ArrayList<String>();
 		File readSpace = new File(fileLocation);

@@ -1,4 +1,5 @@
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -15,6 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 public class Game
 {
@@ -937,9 +942,30 @@ public class Game
 	{
 		JPanel panel = new JPanel();
 		
+		String allRules = "";
+		ArrayList<String> rulesByLine = Squirrelopoly.textFileToArrayList("src/GameRules.txt");
+		for(int i = 0; i < rulesByLine.size(); i++)
+		{
+			allRules += rulesByLine.get(i);
+			allRules += "\n";
+		}
+		
+		//read from GameRules.txt
+		JTextArea textArea = new JTextArea(allRules);
+		textArea.setEditable(false);
+		textArea.setSize(new Dimension(500, 500));
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); 
+		JScrollBar bar = scrollPane.getVerticalScrollBar();
+		bar.setPreferredSize(new Dimension(15, 0));;
+		//scrollPane.setVerticalScrollBarPolicy();
+		//panel.add(scrollPane, BorderLayout.CENTER);
+		
 		final JDialog frame = new JDialog(gameDisplay, "Rules", true);
 		frame.setPreferredSize(new Dimension(500, 500));
-		frame.getContentPane().add(panel);
+		frame.getContentPane().add(scrollPane);
 		frame.pack();
 		frame.setLocationRelativeTo(gameDisplay);
 		frame.setVisible(true);
